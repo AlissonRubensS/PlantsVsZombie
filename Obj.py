@@ -33,8 +33,17 @@ class ObjRender:
             [4,5,6,7]
         ]
 
-        glBegin(GL_QUADS)
+        glPolygonMode(GL_FRONT_AND_BACK, GL_FILL)
         glColor(self.r, self.g, self.b)
+        glBegin(GL_QUADS)
+        for f in faces:
+            for vid in f:
+                glVertex3fv(vertex[vid])
+        glEnd()
+        
+        glPolygonMode(GL_FRONT_AND_BACK, GL_LINE)
+        glColor(0, 0, 0)
+        glBegin(GL_QUADS)
         for f in faces:
             for vid in f:
                 glVertex3fv(vertex[vid])
