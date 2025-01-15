@@ -5,8 +5,8 @@ from OpenGL.GLU import *
 from Obj import ObjRender
 from Player import Player
 
-x, y, z = 0, 0, 0 
-veloc = 0.050
+x, y, z = 0, 2, 0 
+veloc = 0.025
 keys = {
     glfw.KEY_A: False,
     glfw.KEY_D: False,
