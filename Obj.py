@@ -1,5 +1,6 @@
 from OpenGL.GL import *
 
+# Classe "Mãe"
 class ObjRender:
     def __init__(self, x, y, z, r, g, b):
         # Adicionar os pontos centrais 
