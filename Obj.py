@@ -8,43 +8,51 @@ class ObjRender:
         self.z = z
 
         # Adicionar as cores
-        self.r = r
-        self.g = g
-        self.b = b
+        self.r = r / 255
+        self.g = g / 255
+        self.b = b / 255
 
-    def RenderCube(self, heigth, width, deph):
+    def RenderCube(self, width, height, depth):
         vertex = [
-            [self.x - heigth/2, self.y - width/2, self.z - deph/2],
-            [self.x + heigth/2, self.y - width/2, self.z - deph/2],
-            [self.x + heigth/2, self.y + width/2, self.z - deph/2],
-            [self.x - heigth/2, self.y + width/2, self.z - deph/2],
-            [self.x - heigth/2, self.y - width/2, self.z + deph/2],
-            [self.x + heigth/2, self.y - width/2, self.z + deph/2],
-            [self.x + heigth/2, self.y + width/2, self.z + deph/2],
-            [self.x - heigth/2, self.y + width/2, self.z + deph/2],
+            [ 1,  1, -1], # Vértice superior frontal direito
+            [ 1, -1, -1], # Vértice inferior frontal direito
+            [-1, -1, -1], # Vértice inferior frontal esquerdo
+            [-1,  1, -1], # Vértice superior frontal esquerdo
+            [ 1,  1,  1], # Vértice superior traseiro direito
+            [ 1, -1,  1], # Vértice inferior traseiro direito
+            [-1, -1,  1], # Vértice inferior traseiro esquerdo
+            [-1,  1,  1], # Vértice superior traseiro esquerdo
         ]
 
         faces = [
-            [0,1,2,3],
-            [0,1,5,4],
-            [1,2,6,5],
-            [2,3,7,6],
-            [3,0,4,7],
-            [4,5,6,7]
+            [0, 1, 2, 3], # Frente
+            [4, 5, 6, 7], # Trás
+            [0, 4, 7, 3], # Topo
+            [1, 5, 6, 2], # Fundo
+            [0, 1, 5, 4], # Lado direito
+            [3, 2, 6, 7], # Lado esquerdo
         ]
 
+        # Transformações
+        glPushMatrix()
+        glTranslatef(self.x, self.y + height, self.z)
+        glScalef(width, height, depth)
+
+        # Renderizar tiras de triângulos
         glPolygonMode(GL_FRONT_AND_BACK, GL_FILL)
-        glColor(self.r, self.g, self.b)
+        glColor3f(self.r, self.g, self.b)
         glBegin(GL_QUADS)
-        for f in faces:
-            for vid in f:
+        for strip in faces:
+            for vid in strip:
                 glVertex3fv(vertex[vid])
         glEnd()
-        
+
+        # Renderizar contornos
         glPolygonMode(GL_FRONT_AND_BACK, GL_LINE)
-        glColor(0, 0, 0)
+        glColor3f(0, 0, 0)
         glBegin(GL_QUADS)
-        for f in faces:
-            for vid in f:
+        for strip in faces:
+            for vid in strip:
                 glVertex3fv(vertex[vid])
         glEnd()
+        glPopMatrix()

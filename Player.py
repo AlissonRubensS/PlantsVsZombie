@@ -7,14 +7,14 @@ class Player(ObjRender):
     
     def spawn(self):
         vertex = [
-            [self.x - 2.5, self.y - 5, self.z - 2.5],
-            [self.x + 2.5, self.y - 5, self.z - 2.5],
-            [self.x + 2.5, self.y + 5, self.z - 2.5],
-            [self.x - 2.5, self.y + 5, self.z - 2.5],
-            [self.x - 2.5, self.y - 5, self.z + 2.5],
-            [self.x + 2.5, self.y - 5, self.z + 2.5],
-            [self.x + 2.5, self.y + 5, self.z + 2.5],
-            [self.x - 2.5, self.y + 5, self.z + 2.5],
+            [self.x - 2, self.y, self.z - 2],
+            [self.x + 2, self.y, self.z - 2],
+            [self.x + 2, self.y + 8, self.z - 2],
+            [self.x - 2, self.y + 8, self.z - 2],
+            [self.x - 2, self.y, self.z + 2],
+            [self.x + 2, self.y, self.z + 2],
+            [self.x + 2, self.y + 8, self.z + 2],
+            [self.x - 2, self.y + 8, self.z + 2],
         ]
 
         faces = [
