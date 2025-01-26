@@ -5,7 +5,8 @@ from OpenGL.GLU import *
 from Obj import ObjRender
 from Player import Player
 
-x, y, z = 0, 2, 0 
+# Variáveis Globais
+x, y, z = 0, 5, 0 
 veloc = 0.025
 keys = {
     glfw.KEY_A: False,
@@ -13,14 +14,15 @@ keys = {
     glfw.KEY_S: False,
     glfw.KEY_W: False,
 }
-
 plantas = []
 
+# Init
 def initialize():
     glClearColor(1,1,1,1)
     glLineWidth(5)
     glEnable(GL_DEPTH_TEST) # habilitando o algoritmo z-buffer (remoÃ§Ã£o correta de superfÃ­cies ocultadas por outras. Essencial em cenas 3d)
 
+# Função que desenha na tela
 def render():
     # Chamadas de funções recorrentes
     movePoint()
@@ -39,15 +41,13 @@ def render():
                 0, 1 , 0)       # Vetor Up
 
     # Renderização de objetos na cena
-    chao = ObjRender(0, -5, 0, 1, 0, 0)
-    chao.RenderCube(40, 4, 40)
-
-    player = Player(x, y, z,
-                    0, 1, 0)
+    chao = ObjRender(0, -3, 0, 165, 245, 96)
+    chao.RenderCube(20, 1.5, 20)
+    player = Player(x, y, z, 0, 0, 255)
     player.spawn()
 
     for p in plantas:
-        p.RenderCube(5, 10, 5)
+        p.RenderCube(2, 4000, 2)
 
 def keyboard(window, key, scancode, action, mods):
     global keys
@@ -65,7 +65,7 @@ def movePoint():
     if keys[glfw.KEY_W]: x -= veloc
 
 def plantar():
-    planta = ObjRender(x, y, z, 0, 0, 1)
+    planta = ObjRender(x, y, z, 240, 114, 94)
     plantas.append(planta)
 
 def main():
