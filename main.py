@@ -47,7 +47,7 @@ def render():
     player.spawn()
 
     for p in plantas:
-        p.RenderCube(2, 4000, 2)
+        p.RenderCube(2, 4, 2)
 
 def keyboard(window, key, scancode, action, mods):
     global keys
@@ -70,7 +70,7 @@ def plantar():
 
 def main():
     glfw.init()                                                      
-    window = glfw.create_window(800,800,'08 - Teste',None,None)
+    window = glfw.create_window(800,800,'PVZ',None,None)
     glfw.make_context_current(window)       
     glfw.set_key_callback(window,keyboard)                        
     initialize()                                                    

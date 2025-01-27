@@ -38,7 +38,7 @@ class ObjRender:
         glTranslatef(self.x, self.y + height, self.z)
         glScalef(width, height, depth)
 
-        # Renderizar tiras de triângulos
+        # Renderizar tiras de preenchimento
         glPolygonMode(GL_FRONT_AND_BACK, GL_FILL)
         glColor3f(self.r, self.g, self.b)
         glBegin(GL_QUADS)
@@ -56,3 +56,46 @@ class ObjRender:
                 glVertex3fv(vertex[vid])
         glEnd()
         glPopMatrix()
+
+    def RenderTriangle(self, base, height):
+        vertex = [
+            [ 1, -1,  0],
+            [ 1,  1,  0],
+            [-1,  0,  0],
+            [ 0,  0,  1],
+        ]
+
+        faces = [
+            [0, 1, 2],
+            [0, 1, 3],
+            [0, 2, 3],
+            [1, 2, 3],
+        ]
+
+        glPushMatrix()
+
+        glTranslatef(self.x, self.y, self.z)
+        glScalef(base/2, height, base/2)
+        glRotatef(-90, 1, 0, 0)
+
+        # Renderizar preenchimentos
+        glPolygonMode(GL_FRONT_AND_BACK, GL_FILL)
+        glColor3f(self.r, self.g, self.b)
+        glBegin(GL_TRIANGLES)
+        for strip in faces:
+            for vid in strip:
+                glVertex3fv(vertex[vid])
+        glEnd()
+
+        # Renderizar contornos
+        glPolygonMode(GL_FRONT_AND_BACK, GL_LINE)
+        glColor3f(0, 0, 0)
+        glBegin(GL_TRIANGLES)
+        for strip in faces:
+            for vid in strip:
+                glVertex3fv(vertex[vid])
+
+        glEnd()
+        glPopMatrix()
+
+    
