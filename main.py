@@ -7,14 +7,15 @@ from Player import Player
 from Peashooter import Peashooter
 
 # Variáveis Globais
+limite_x_positivo = 15
+limite_x_negativo = -15
+limite_z_positivo = 15
+limite_z_negativo = -15
+
+
 x, y, z = 0, 0, 0 
-veloc = 0.025
-keys = {
-    glfw.KEY_A: False,
-    glfw.KEY_D: False,
-    glfw.KEY_S: False,
-    glfw.KEY_W: False,
-}
+veloc = 0.050
+
 plantas = []
 
 # Init
@@ -25,9 +26,6 @@ def initialize():
 
 # Função que desenha na tela
 def render():
-    # Chamadas de funções recorrentes
-    movePoint()
-
     # Definição do espaço
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)   
     glMatrixMode(GL_PROJECTION)      
@@ -50,20 +48,37 @@ def render():
     for p in plantas:
         p.Spawn()
 
+def mover(eixo, polaridade):
+    global x,y,z
+
+    distancia_movimento = 5
+    if eixo:
+        if polaridade:
+            x = min(distancia_movimento + x, limite_x_positivo)
+        else:
+            x = max( x - distancia_movimento,limite_x_negativo)
+    else:
+        if polaridade:
+            z = min(distancia_movimento + z,limite_z_positivo)
+        else:
+            z = max(z - distancia_movimento,limite_z_negativo)
+
+
 def keyboard(window, key, scancode, action, mods):
     global keys
-    if action == glfw.PRESS:     keys[key] = True
-    elif action == glfw.RELEASE: keys[key] = False
+
+    if action == glfw.PRESS:
+        if key == glfw.KEY_S:
+            mover(True, True)
+        if key == glfw.KEY_W:
+            mover(True, False)
+        if key == glfw.KEY_A:
+            mover(False, True)
+        if key == glfw.KEY_D:
+            mover(False, False)
 
     if action == glfw.PRESS and key == glfw.KEY_1:
         plantar()
-
-def movePoint():
-    global x, y, z
-    if keys[glfw.KEY_A]: z += veloc
-    if keys[glfw.KEY_D]: z -= veloc
-    if keys[glfw.KEY_S]: x += veloc
-    if keys[glfw.KEY_W]: x -= veloc
 
 def plantar():
     planta = Peashooter(x, y, z, 100, 10, 5)
