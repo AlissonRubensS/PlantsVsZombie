@@ -1,18 +1,18 @@
 from OpenGL.GL import *
 
 class ObjRender:
-    def __init__(self, x, y, z, r, g, b):
+    def __init__(self, x, y, z):
         # Adicionar os pontos centrais 
         self.x = x
         self.y = y
         self.z = z
 
+    def RenderCube(self, width, height, depth, r, g, b):
         # Adicionar as cores
-        self.r = r / 255
-        self.g = g / 255
-        self.b = b / 255
+        r = r / 255
+        g = g / 255
+        b = b / 255
 
-    def RenderCube(self, width, height, depth):
         vertex = [
             [ 1,  1, -1], # Vértice superior frontal direito
             [ 1, -1, -1], # Vértice inferior frontal direito
@@ -40,7 +40,7 @@ class ObjRender:
 
         # Renderizar tiras de preenchimento
         glPolygonMode(GL_FRONT_AND_BACK, GL_FILL)
-        glColor3f(self.r, self.g, self.b)
+        glColor3f(r, g, b)
         glBegin(GL_QUADS)
         for strip in faces:
             for vid in strip:
@@ -57,7 +57,12 @@ class ObjRender:
         glEnd()
         glPopMatrix()
 
-    def RenderTriangle(self, base, height):
+    def RenderTriangle(self, base, height, r, g, b):
+        # Adicionar as cores
+        r = r / 255
+        g = g / 255
+        b = b / 255
+
         vertex = [
             [ 1, -1,  0],
             [ 1,  1,  0],
@@ -74,7 +79,7 @@ class ObjRender:
 
         glPushMatrix()
 
-        glTranslatef(self.x, self.y, self.z)
+        glTranslatef(r, g, b)
         glScalef(base/2, height, base/2)
         glRotatef(-90, 1, 0, 0)
 
