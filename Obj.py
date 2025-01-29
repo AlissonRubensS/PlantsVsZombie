@@ -86,7 +86,7 @@ class ObjRender:
 
         # Renderizar preenchimentos
         glPolygonMode(GL_FRONT_AND_BACK, GL_FILL)
-        glColor3f(self.r, self.g, self.b)
+        glColor3f(r, g, b)
         glBegin(GL_TRIANGLES)
         for strip in faces:
             for vid in strip:
@@ -104,4 +104,57 @@ class ObjRender:
         glEnd()
         glPopMatrix()
 
-    
+    def RenderPrismaTriangular(self, base, depth, height, r, g, b):
+        r, g, b = r / 255, g / 255, b / 255
+
+        # Vértices do prisma triangular
+        vertex = [
+            [-base, 0, -depth],  # Base frontal esquerda
+            [ base, 0, -depth],  # Base frontal direita
+            [ 0, height, -depth],    # Topo frontal
+            [-base, 0, depth],   # Base traseira esquerda
+            [ base, 0, depth ],   # Base traseira direita
+            [ 0, height, depth]      # Topo traseiro
+        ]
+
+        faces = [
+            [0, 1, 2], [3, 4, 5],  # Bases triangulares (frontal e traseira)
+            [0, 1, 4, 3],  # Face retangular inferior
+            [1, 2, 5, 4],  # Face retangular direita
+            [2, 0, 3, 5],  # Face retangular esquerda
+        ]
+
+        glPushMatrix()
+        glTranslatef(self.x, self.y, self.z)
+
+        # Preenchimento
+        glPolygonMode(GL_FRONT_AND_BACK, GL_FILL)
+        glColor3f(r, g, b)
+        glBegin(GL_TRIANGLES)
+        for face in faces[:2]:  # Desenha as bases triangulares
+            for vid in face:
+                glVertex3fv(vertex[vid])
+        glEnd()
+
+        glBegin(GL_QUADS)
+        for face in faces[2:]:  # Desenha as faces retangulares
+            for vid in face:
+                glVertex3fv(vertex[vid])
+        glEnd()
+
+        # Contornos
+        glPolygonMode(GL_FRONT_AND_BACK, GL_LINE)
+        glColor3f(0, 0, 0)
+        glBegin(GL_TRIANGLES)
+        for face in faces[:2]:  
+            for vid in face:
+                glVertex3fv(vertex[vid])
+        glEnd()
+
+        glBegin(GL_QUADS)
+        for face in faces[2:]:
+            for vid in face:
+                glVertex3fv(vertex[vid])
+        glEnd()
+
+        glPopMatrix()

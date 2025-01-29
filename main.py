@@ -30,18 +30,44 @@ def render():
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)   
     glMatrixMode(GL_PROJECTION)      
     glLoadIdentity()                 
-    glFrustum(-1, 1, -1, 1, 2, 100)  
+    glFrustum(-1, 1, -1, 1, 2, 150)  
 
     # Configuração de câmera
     glMatrixMode(GL_MODELVIEW)     
     glLoadIdentity()              
-    gluLookAt(  60,20, 0,       # Posição da Câmera
+    gluLookAt(  100, 20, 0,       # Posição da Câmera
                 0, 0 , 0,       # Foco da camera
                 0, 1 , 0)       # Vetor Up
 
     # Renderização de objetos na cena
-    chao = ObjRender(0, -3, 0)
-    chao.RenderCube(20, 1.5, 20, 165, 245, 96)
+    
+    field = ObjRender(0, -3, 0)
+    field.RenderCube(20, 1.5, 20, 165, 245, 96)
+
+    
+    fence = ObjRender(-19, 0, 0)
+    fence.RenderCube(1, 2, 20, 255, 255, 255)
+    bush_back= ObjRender(-19, 0, -40)
+    bush_back.RenderCube(1, 1.5, 10, 31, 48, 32)
+    bush_front= ObjRender(19, 0, -40)
+    bush_front.RenderCube(1, 1.5, 10, 31, 48, 32)
+    
+
+    house = ObjRender(0,0, 25)
+    house.RenderCube(20, 5, 5, 238, 223, 190)
+
+    roof = ObjRender(0,10,25)
+    roof.RenderPrismaTriangular(20,5,8, 191, 62, 33)
+    
+    road = ObjRender(0, -3, -25)
+    road.RenderCube(20, 1.5, 5, 128, 128, 128)
+    
+    underground = ObjRender(0,-3, 25)
+    underground.RenderCube(20, 1.5, 5, 64, 59, 19)
+    
+    cemetery = ObjRender(0, -3, -40)
+    cemetery.RenderCube(20, 1.5, 10, 64, 59, 19)
+
     player = Player(x, y, z)
     player.spawn()
 
@@ -50,6 +76,7 @@ def render():
 
 def mover(eixo, polaridade):
     global x,y,z
+    print(z,y,z)
 
     distancia_movimento = 5
     if eixo:
