@@ -4,9 +4,10 @@ from OpenGL.GLU import *
 
 from Obj import ObjRender
 from Player import Player
+from Peashooter import Peashooter
 
 # Variáveis Globais
-x, y, z = 0, 5, 0 
+x, y, z = 0, 0, 0 
 veloc = 0.025
 keys = {
     glfw.KEY_A: False,
@@ -41,13 +42,13 @@ def render():
                 0, 1 , 0)       # Vetor Up
 
     # Renderização de objetos na cena
-    chao = ObjRender(0, -3, 0, 165, 245, 96)
-    chao.RenderCube(20, 1.5, 20)
-    player = Player(x, y, z, 0, 0, 255)
+    chao = ObjRender(0, -3, 0)
+    chao.RenderCube(20, 1.5, 20, 165, 245, 96)
+    player = Player(x, y, z)
     player.spawn()
 
     for p in plantas:
-        p.RenderCube(2, 4, 2)
+        p.Spawn()
 
 def keyboard(window, key, scancode, action, mods):
     global keys
@@ -65,9 +66,9 @@ def movePoint():
     if keys[glfw.KEY_W]: x -= veloc
 
 def plantar():
-    planta = ObjRender(x, y, z, 240, 114, 94)
+    planta = Peashooter(x, y, z, 100, 10, 5)
     plantas.append(planta)
-
+    
 def main():
     glfw.init()                                                      
     window = glfw.create_window(800,800,'PVZ',None,None)

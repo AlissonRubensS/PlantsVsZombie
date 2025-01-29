@@ -2,8 +2,8 @@ from OpenGL.GL import *
 from Obj import ObjRender
 
 class Player(ObjRender):
-    def __init__(self, x, y, z, r, g, b):
-        super().__init__(x, y, z, r, g, b)
+    def __init__(self, x, y, z):
+        super().__init__(x, y, z)
     
     def spawn(self):
         vertex = [
@@ -27,7 +27,7 @@ class Player(ObjRender):
         ]
 
         glPolygonMode(GL_FRONT_AND_BACK, GL_LINE)
-        glColor(self.r, self.g, self.b)
+        glColor(0, 1, 0)
         glBegin(GL_QUADS)
         for f in faces:
             for vid in f:
