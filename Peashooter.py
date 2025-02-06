@@ -15,5 +15,10 @@ class Peashooter(ObjRender):
         # Cabaça da planta
         glPushMatrix()
         glTranslatef(0, 4.5, 0)
-        self.RenderCube(1, 1, 2, 95, 235, 92)
+        self.RenderCube(1, 1, 1, 95, 235, 92)
         glPopMatrix()
+
+    def Shooter(self):
+        shoot = ObjRender(self.x, self.y, self.z)
+        shoot.RenderCircle(30, 30, 1)
+        return shoot

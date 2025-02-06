@@ -1,4 +1,5 @@
 from OpenGL.GL import *
+import math
 
 # Classe "Mãe"
 class ObjRender:

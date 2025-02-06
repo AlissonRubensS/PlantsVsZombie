@@ -16,9 +16,8 @@ limite_z_negativo = -15
 
 # Variáveis Globais
 x, y, z = 0, 0, 0 
-veloc = 0.050
-
 plantas = []
+tiros = []
 
 # Init
 def initialize():
@@ -75,6 +74,8 @@ def render():
 
     for p in plantas:
         p.Spawn()
+        
+        if ()
 
 def mover(eixo, polaridade):
     global x,y,z
@@ -121,7 +122,7 @@ def main():
     initialize()                                                    
     while not glfw.window_should_close(window):                     
         glfw.poll_events()                                          
-        render()                                                    
+        render()     
         glfw.swap_buffers(window)                                   
     glfw.terminate()                                                
 
