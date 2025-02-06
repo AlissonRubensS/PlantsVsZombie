@@ -5,7 +5,6 @@ from OpenGL.GLU import *
 from Obj import ObjRender
 from Player import Player
 from Peashooter import Peashooter
-<<<<<<< Updated upstream
 
 # Variáveis Globais
 limite_x_positivo = 15
@@ -75,11 +74,8 @@ def render():
     for p in plantas:
         p.Spawn()
         
-        if ()
-
 def mover(eixo, polaridade):
     global x,y,z
-    print(z,y,z)
 
     distancia_movimento = 5
     if eixo:
