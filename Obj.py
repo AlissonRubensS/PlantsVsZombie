@@ -2,11 +2,7 @@ from OpenGL.GL import *
 
 # Classe "Mãe"
 class ObjRender:
-<<<<<<< Updated upstream
     def __init__(self, x, y, z):
-=======
-    def _init_(self, x, y, z):
->>>>>>> Stashed changes
         # Adicionar os pontos centrais 
         self.x = x
         self.y = y
@@ -90,11 +86,7 @@ class ObjRender:
 
         # Renderizar preenchimentos
         glPolygonMode(GL_FRONT_AND_BACK, GL_FILL)
-<<<<<<< Updated upstream
         glColor3f(r, g, b)
-=======
-        glColor3f(self.r, self.g, self.b)
->>>>>>> Stashed changes
         glBegin(GL_TRIANGLES)
         for strip in faces:
             for vid in strip:
@@ -110,7 +102,6 @@ class ObjRender:
                 glVertex3fv(vertex[vid])
 
         glEnd()
-<<<<<<< Updated upstream
         glPopMatrix()
 
     def RenderPrismaTriangular(self, base, depth, height, r, g, b):
@@ -166,6 +157,4 @@ class ObjRender:
                 glVertex3fv(vertex[vid])
         glEnd()
 
-=======
->>>>>>> Stashed changes
         glPopMatrix()

@@ -13,23 +13,11 @@ limite_x_negativo = -15
 limite_z_positivo = 15
 limite_z_negativo = -15
 
-=======
->>>>>>> Stashed changes
 
 # Variáveis Globais
 x, y, z = 0, 0, 0 
-<<<<<<< Updated upstream
 veloc = 0.050
 
-=======
-veloc = 0.025
-keys = {
-    glfw.KEY_A: False,
-    glfw.KEY_D: False,
-    glfw.KEY_S: False,
-    glfw.KEY_W: False,
-}
->>>>>>> Stashed changes
 plantas = []
 
 # Init
@@ -54,7 +42,6 @@ def render():
                 0, 1 , 0)       # Vetor Up
 
     # Renderização de objetos na cena
-<<<<<<< Updated upstream
     
     field = ObjRender(0, -3, 0)
     field.RenderCube(20, 1.5, 20, 165, 245, 96)
@@ -83,16 +70,11 @@ def render():
     cemetery = ObjRender(0, -3, -40)
     cemetery.RenderCube(20, 1.5, 10, 64, 59, 19)
 
-=======
-    chao = ObjRender(0, -3, 0)
-    chao.RenderCube(20, 1.5, 20, 165, 245, 96)
->>>>>>> Stashed changes
     player = Player(x, y, z)
     player.spawn()
 
     for p in plantas:
         p.Spawn()
-<<<<<<< Updated upstream
 
 def mover(eixo, polaridade):
     global x,y,z
@@ -110,8 +92,6 @@ def mover(eixo, polaridade):
         else:
             z = max(z - distancia_movimento,limite_z_negativo)
 
-=======
->>>>>>> Stashed changes
 
 def keyboard(window, key, scancode, action, mods):
     global keys
@@ -132,12 +112,7 @@ def keyboard(window, key, scancode, action, mods):
 def plantar():
     planta = Peashooter(x, y, z, 100, 10, 5)
     plantas.append(planta)
-<<<<<<< Updated upstream
     
-=======
-    print("Plantar")
-
->>>>>>> Stashed changes
 def main():
     glfw.init()                                                      
     window = glfw.create_window(800,800,'PVZ',None,None)
@@ -150,4 +125,5 @@ def main():
         glfw.swap_buffers(window)                                   
     glfw.terminate()                                                
 
+if __name__ == '__main__':
     main()
