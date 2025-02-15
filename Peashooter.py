@@ -1,16 +1,12 @@
 from OpenGL.GL import *
 from Plants import *
 
-import time
-import threading
-
-
 class Peashooter(Plants):
-    def __init__(self, x, y, z, hp, demage, cooldown):
-        super().__init__(x, y, z, hp, demage, cooldown)
-        self.Shooter()
+    def __init__(self, x, y, z, hp, demage):
+        super().__init__(x, y, z, hp, demage)
+        self.type = "Peashooter"
 
-    def Spawn(self):
+    def render(self):
         # Cabo da planta
         self.RenderCube(0.5, 3, 0.5, 187, 105, 47)
 
@@ -20,10 +16,5 @@ class Peashooter(Plants):
         self.RenderCube(1, 1, 1, 95, 235, 92)
         glPopMatrix()
 
-    def Shooter(self):
-        # shoot = ObjRender(self.x, self.y, self.z)
-        # shoot.RenderCircle(30, 30, 1)
-        print("Atirou")
-        threading.Timer(10, self.Shooter).start()
-
-    
+    def getPos(self):
+        return (self.x, self.y, self.z)

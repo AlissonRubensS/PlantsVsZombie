@@ -5,7 +5,7 @@ class Player(ObjRender):
     def __init__(self, x, y, z):
         super().__init__(x, y, z)
     
-    def spawn(self):
+    def render(self):
         vertex = [
             [self.x - 2, self.y, self.z - 2],
             [self.x + 2, self.y, self.z - 2],

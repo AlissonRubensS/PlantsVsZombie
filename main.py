@@ -5,6 +5,9 @@ from OpenGL.GLU import *
 from Obj import ObjRender
 from Player import Player
 from Peashooter import Peashooter
+from Shoot import Shoot
+
+import time
 
 # Variáveis Globais
 limite_x_positivo = 15
@@ -12,17 +15,23 @@ limite_x_negativo = -15
 limite_z_positivo = 15
 limite_z_negativo = -15
 
-
-# Variáveis Globais
 x, y, z = 0, 0, 0 
-plantas = []
-tiros = []
+plants = []
+shoots = []
 
 # Init
 def initialize():
     glClearColor(1,1,1,1)
     glLineWidth(5)
     glEnable(GL_DEPTH_TEST) # habilitando o algoritmo z-buffer (remoÃ§Ã£o correta de superfÃ­cies ocultadas por outras. Essencial em cenas 3d)
+
+# Função para alterações do código
+def update():
+    for p in plants:
+        if p.type == "Peashooter" and time.time() - p.time_init  > 10:
+            px, py, pz = p.getPos()
+            shoots.append(Shoot(px, py, pz))
+            p.time_init = time.time()
 
 # Função que desenha na tela
 def render():
@@ -69,11 +78,18 @@ def render():
     cemetery.RenderCube(20, 1.5, 10, 64, 59, 19)
 
     player = Player(x, y, z)
-    player.spawn()
+    player.render()
 
-    for p in plantas:
-        p.Spawn()
-        
+    for p in plants:
+        p.render()
+
+    for s in shoots:
+        if limite_z_negativo <= s.z:
+            s.render()
+        else:
+            shoots.remove(s)
+
+# Função de mover o player        
 def mover(eixo, polaridade):
     global x,y,z
 
@@ -89,7 +105,7 @@ def mover(eixo, polaridade):
         else:
             z = max(z - distancia_movimento,limite_z_negativo)
 
-
+# Função de controle do teclado
 def keyboard(window, key, scancode, action, mods):
     global keys
 
@@ -104,21 +120,21 @@ def keyboard(window, key, scancode, action, mods):
             mover(False, False)
 
     if action == glfw.PRESS and key == glfw.KEY_1:
-        plantar()
-
-def plantar():
-    planta = Peashooter(x, y, z, 100, 10, 5)
-    plantas.append(planta)
+        plant = Peashooter(x, y, z, 100, 10)
+        plants.append(plant)
     
 def main():
     glfw.init()                                                      
     window = glfw.create_window(800,800,'PVZ',None,None)
     glfw.make_context_current(window)       
     glfw.set_key_callback(window,keyboard)                        
-    initialize()                                                    
+    initialize()                    
+
+    # Looping principal do código                                
     while not glfw.window_should_close(window):                     
-        glfw.poll_events()                                          
-        render()     
+        glfw.poll_events()                                                          
+        update()
+        render()
         glfw.swap_buffers(window)                                   
     glfw.terminate()                                                
 
