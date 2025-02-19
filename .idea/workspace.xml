@@ -5,9 +5,8 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="3666ecd2-22ed-4b9b-814b-eef5769e6fc9" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/Obj.py" beforeDir="false" afterPath="$PROJECT_DIR$/Obj.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Player.py" beforeDir="false" afterPath="$PROJECT_DIR$/Player.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/README.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Peashooter.py" beforeDir="false" afterPath="$PROJECT_DIR$/Peashooter.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/main.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -18,9 +17,9 @@
   <component name="Git.Settings">
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
   </component>
-  <component name="ProjectColorInfo"><![CDATA[{
-  "associatedIndex": 5
-}]]></component>
+  <component name="ProjectColorInfo">{
+  &quot;associatedIndex&quot;: 5
+}</component>
   <component name="ProjectId" id="2sJ0uTmmGCsU0nvl0vdCpKzEQOs" />
   <component name="ProjectViewState">
     <option name="hideEmptyMiddlePackages" value="true" />
@@ -30,7 +29,8 @@
   "keyToString": {
     "Python.main.executor": "Run",
     "RunOnceActivity.ShowReadmeOnStart": "true",
-    "git-widget-placeholder": "main",
+    "RunOnceActivity.git.unshallow": "true",
+    "git-widget-placeholder": "Fernando",
     "last_opened_file_path": "C:/Users/Ferna/Documents/GitHub/PlantsVsZombie"
   }
 }]]></component>

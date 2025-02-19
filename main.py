@@ -1,10 +1,14 @@
 import glfw
 from OpenGL.GL import *
-from OpenGL.GLU import * 
+from OpenGL.GLU import *
+from PIL import Image
+import numpy as np
 
 from Obj import ObjRender
 from Player import Player
 from Peashooter import Peashooter
+#textura
+
 
 # Variáveis Globais
 limite_x_positivo = 15
@@ -76,8 +80,13 @@ def keyboard(window, key, scancode, action, mods):
             mover(False, True)
         if key == glfw.KEY_D:
             mover(False, False)
+        if key == glfw.KEY_B and len(plantas) > 0:
+            plantas.pop()
 
     if action == glfw.PRESS and key == glfw.KEY_1:
+        for p in plantas:
+            if p.x == x and p.z == z:
+                return
         plantar()
 
 def plantar():

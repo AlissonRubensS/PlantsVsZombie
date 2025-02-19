@@ -1,12 +1,15 @@
 from OpenGL.GL import *
 from Obj import *
 
+
 class Peashooter(ObjRender):
-    def __init__(self, x, y, z, hp, demage, cooldown):
+    def __init__(self,x, y, z, hp, demage, cooldown):
         super().__init__(x, y, z)
         self.hp = hp
         self.demage = demage
         self.coolsdown = cooldown
+
+
 
     def Spawn(self):
         # Cabo da planta
