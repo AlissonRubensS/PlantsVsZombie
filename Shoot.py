@@ -9,9 +9,5 @@ class Shoot(ObjRender):
         self.start_time = time.time()
 
     def render(self):
-        glPushMatrix()
-        z_position = (time.time() - self.start_time) * self.veloc
-        glTranslatef(0, 4, -z_position)
+        self.z = -1 *(time.time() - self.start_time) * self.veloc
         self.RenderCube(0.3, 0.3, 0.3, 150, 75, 0)
-
-        glPopMatrix()

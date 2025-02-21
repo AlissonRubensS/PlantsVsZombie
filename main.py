@@ -7,6 +7,7 @@ from Player import Player
 from Peashooter import Peashooter
 from Potato import Potato
 from Shoot import Shoot
+from CherryBomb import CherryBomb
 
 import time
 
@@ -42,11 +43,14 @@ def update():
     for p in plants:
         if p.type == "Peashooter" and time.time() - p.time_init  > 10:
             px, py, pz = p.getPos()
-            shoots.append(Shoot(px, py, pz))
+            shoots.append(Shoot(px, py + 4, pz))
             p.time_init = time.time()
+        if p.type == "CherryBomb" and time.time() - p.time_init  > 2:
+            plants.remove(p)
+
     
     for s in shoots:
-        if s.z < limite_z_negativo:
+        if s.z < -45:
             shoots.remove(s)
 
     mover_camera_posicao()
@@ -71,7 +75,6 @@ def render():
     
     field = ObjRender(0, -3, 0)
     field.RenderCube(20, 1.5, 20, 165, 245, 96)
-
     
     fence = ObjRender(-19, 0, 0)
     fence.RenderCube(1, 2, 20, 100, 100, 100)
@@ -79,7 +82,6 @@ def render():
     bush_back.RenderCube(1, 1.5, 10, 31, 48, 32)
     bush_front= ObjRender(19, 0, -40)
     bush_front.RenderCube(1, 1.5, 10, 31, 48, 32)
-    
 
     house = ObjRender(0,0, 25)
     house.RenderCube(20, 5, 5, 238, 223, 190)
@@ -150,11 +152,12 @@ def planting(type):
     # Se não tiver planta
     if type == "Peashooter":
         new_plant = Peashooter(x, y, z, 100, 10)
-        plants.append(new_plant)
     elif type == "Potato":
-        new_plant = Potato(x, y, z, 100, 10)
-        plants.append(new_plant)
+        new_plant = Potato(x, y, z, 1000, 0)
+    elif type == "CherryBomb":
+        new_plant = CherryBomb(x, y, z, 1, 1000)
 
+    plants.append(new_plant)
 
 # Função de controle do teclado
 def keyboard(window, key, scancode, action, mods):
@@ -177,11 +180,12 @@ def keyboard(window, key, scancode, action, mods):
             planting("Peashooter")
         if key == glfw.KEY_2:
             planting("Potato")
+        if key == glfw.KEY_3:
+            planting("CherryBomb")
         
         # Câmera
         if key == glfw.KEY_ENTER:
-            moveCam()
-        
+            moveCam()    
     
 def main():
     glfw.init()                                                      
