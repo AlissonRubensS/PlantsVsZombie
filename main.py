@@ -5,6 +5,7 @@ from OpenGL.GLU import *
 from Obj import ObjRender
 from Player import Player
 from Peashooter import Peashooter
+from Potato import Potato
 from Shoot import Shoot
 
 import time
@@ -19,11 +20,22 @@ x, y, z = 0, 0, 0
 plants = []
 shoots = []
 
+Cams = {
+    "1" : [40, 30, -40, -40, 0, 40],
+    "2" : [0, 50, 40, 0, 10, 0],
+    "3" : [-40, 15, 30, 40, 0, -40],
+}
+index = "1"
+
+posicao_atual_camera = list(Cams[index])
+posicao_alvo_camera = list(Cams[index])
+velociade_camera = 0.005
+
 # Init
 def initialize():
     glClearColor(1,1,1,1)
     glLineWidth(5)
-    glEnable(GL_DEPTH_TEST) # habilitando o algoritmo z-buffer (remoÃ§Ã£o correta de superfÃ­cies ocultadas por outras. Essencial em cenas 3d)
+    glEnable(GL_DEPTH_TEST) 
 
 # Função para alterações do código
 def update():
@@ -32,6 +44,12 @@ def update():
             px, py, pz = p.getPos()
             shoots.append(Shoot(px, py, pz))
             p.time_init = time.time()
+    
+    for s in shoots:
+        if s.z < limite_z_negativo:
+            shoots.remove(s)
+
+    mover_camera_posicao()
 
 # Função que desenha na tela
 def render():
@@ -39,15 +57,16 @@ def render():
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)   
     glMatrixMode(GL_PROJECTION)      
     glLoadIdentity()                 
-    glFrustum(-1, 1, -1, 1, 2, 150)  
+    glFrustum(-1, 1, -1, 1, 2, 400)  
 
     # Configuração de câmera
     glMatrixMode(GL_MODELVIEW)     
-    glLoadIdentity()              
-    gluLookAt(  100, 20, 0,       # Posição da Câmera
-                0, 0 , 0,       # Foco da camera
-                0, 1 , 0)       # Vetor Up
-
+    glLoadIdentity()    
+         
+    gluLookAt( *posicao_atual_camera[:3],     # Posição da Câmera
+               *posicao_atual_camera[3:],     # Foco da camera
+                0,   1 , 0  )                 # Vetor Up
+   
     # Renderização de objetos na cena
     
     field = ObjRender(0, -3, 0)
@@ -55,7 +74,7 @@ def render():
 
     
     fence = ObjRender(-19, 0, 0)
-    fence.RenderCube(1, 2, 20, 255, 255, 255)
+    fence.RenderCube(1, 2, 20, 100, 100, 100)
     bush_back= ObjRender(-19, 0, -40)
     bush_back.RenderCube(1, 1.5, 10, 31, 48, 32)
     bush_front= ObjRender(19, 0, -40)
@@ -84,10 +103,7 @@ def render():
         p.render()
 
     for s in shoots:
-        if limite_z_negativo <= s.z:
-            s.render()
-        else:
-            shoots.remove(s)
+        s.render()
 
 # Função de mover o player        
 def mover(eixo, polaridade):
@@ -105,23 +121,67 @@ def mover(eixo, polaridade):
         else:
             z = max(z - distancia_movimento,limite_z_negativo)
 
+# Função de mover Câmera
+def mover_camera_posicao():
+    global posicao_atual_camera
+
+    for i in range(6):
+        posicao_atual_camera[i] += (posicao_alvo_camera[i] - posicao_atual_camera[i]) * velociade_camera
+
+def moveCam():
+    global index, posicao_alvo_camera
+
+    if index == "1":
+        index = "2"
+    elif index == "2":
+        index = "3"
+    elif index == "3":
+        index = "1"
+
+    posicao_alvo_camera = Cams[index]
+
+# Função para plantar
+def planting(type):
+    # Verifica se a alguma planta no local
+    for p in plants:
+        if p.getPos() == (x, y, z) :
+            return
+    
+    # Se não tiver planta
+    if type == "Peashooter":
+        new_plant = Peashooter(x, y, z, 100, 10)
+        plants.append(new_plant)
+    elif type == "Potato":
+        new_plant = Potato(x, y, z, 100, 10)
+        plants.append(new_plant)
+
+
 # Função de controle do teclado
 def keyboard(window, key, scancode, action, mods):
     global keys
 
+    # Funções acionadas por teclas
     if action == glfw.PRESS:
-        if key == glfw.KEY_S:
-            mover(True, True)
-        if key == glfw.KEY_W:
-            mover(True, False)
+        # Movimentação
         if key == glfw.KEY_A:
-            mover(False, True)
+            mover(True, True)
         if key == glfw.KEY_D:
+            mover(True, False)
+        if key == glfw.KEY_S:
+            mover(False, True)
+        if key == glfw.KEY_W:
             mover(False, False)
 
-    if action == glfw.PRESS and key == glfw.KEY_1:
-        plant = Peashooter(x, y, z, 100, 10)
-        plants.append(plant)
+        # Plantar
+        if key == glfw.KEY_1:
+            planting("Peashooter")
+        if key == glfw.KEY_2:
+            planting("Potato")
+        
+        # Câmera
+        if key == glfw.KEY_ENTER:
+            moveCam()
+        
     
 def main():
     glfw.init()                                                      

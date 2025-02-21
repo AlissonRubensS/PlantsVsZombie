@@ -16,5 +16,3 @@ class Peashooter(Plants):
         self.RenderCube(1, 1, 1, 95, 235, 92)
         glPopMatrix()
 
-    def getPos(self):
-        return (self.x, self.y, self.z)
