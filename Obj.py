@@ -8,7 +8,10 @@ class ObjRender:
         self.x = x
         self.y = y
         self.z = z
-
+        
+    def getPos(self):
+        return (self.x, self.y, self.z)
+    
     def RenderCube(self, width, height, depth, r, g, b):
         # Adicionar as cores
         r = r / 255
