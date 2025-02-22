@@ -1,22 +1,31 @@
+# Description: Jogo Plants vs Zombies em 3D
+# Authors: Alisson, Fernando e Samara
+
+# Bibliotecas
 import glfw
 from OpenGL.GL import *
 from OpenGL.GLU import * 
+import time
 
+# Classes
 from Obj import ObjRender
 from Player import Player
 from Peashooter import Peashooter
 from Potato import Potato
 from Shoot import Shoot
-
-import time
-from Zombie import*  # Importe a classe Zombie
+from CherryBomb import CherryBomb
+from Material import Material
+from Zombie import* 
 
 # Variáveis Globais
+
+# Limites de movimento
 limite_x_positivo = 15
 limite_x_negativo = -15
 limite_z_positivo = 15
 limite_z_negativo = -15
 
+# Posições iniciais
 x, y, z = 0, 0, 0 
 plants = []
 shoots = []
@@ -32,6 +41,13 @@ posicao_atual_camera = list(Cams[index])
 posicao_alvo_camera = list(Cams[index])
 velociade_camera = 0.005
 
+# Iluminação
+
+luz_ambiente  =  [0.5, 0.5, 0.5, 1.0]  # Luz ambiente mais forte
+luz_difusa    =  [0.5, 0.5, 0.5, 1.0]  # Luz difusa no máximo
+luz_especualr =  [0.5, 0.5, 0.5, 1.0] # Luz especular
+posicao_luz   =  [40, 30, -40, 1.0]  # Posição da luz
+=======
 # Variáveis Globais
 x, y, z = 15, 0, 15 
 veloc = 0.050
@@ -44,17 +60,27 @@ def initialize():
     glClearColor(1,1,1,1)
     glLineWidth(5)
     glEnable(GL_DEPTH_TEST) 
+    glEnable(GL_LIGHTING)
+    glEnable(GL_COLOR_MATERIAL)
+    glEnable(GL_LIGHT0)
+    glLightfv(GL_LIGHT0, GL_POSITION, posicao_luz)
+    glLightfv(GL_LIGHT0, GL_AMBIENT, luz_ambiente)
+    glLightfv(GL_LIGHT0, GL_DIFFUSE, luz_difusa)
+    glLightfv(GL_LIGHT0, GL_SPECULAR, luz_especualr)
 
 # Função para alterações do código
 def update():
     for p in plants:
         if p.type == "Peashooter" and time.time() - p.time_init  > 10:
             px, py, pz = p.getPos()
-            shoots.append(Shoot(px, py, pz))
+            shoots.append(Shoot(px, py + 4, pz))
             p.time_init = time.time()
+        if p.type == "CherryBomb" and time.time() - p.time_init  > 2:
+            plants.remove(p)
+
     
     for s in shoots:
-        if s.z < limite_z_negativo:
+        if s.z < -45:
             shoots.remove(s)
 
     mover_camera_posicao()
@@ -81,35 +107,87 @@ def render():
               0, 0, 0, 
               0, 1, 0)
 
-    # Renderização de objetos na cena
-    field = ObjRender(0, -3, 0) # campo de batalha
-    field.RenderCube(20, 1.5, 20, 165, 245, 96)
-
-    fence = ObjRender(-19, 0, 0) #cercas
-    fence.RenderCube(1, 2, 20, 255, 255, 255)
-    bush_back = ObjRender(-19, 0, -40) #moitas do cemiterio
+    # Renderização de objetos na cena    
+    grass_matirial = Material([0.1, 0.3, 0.1, 1.0], 
+                              [0.2, 0.6, 0.2, 1.0], 
+                              [0.1, 0.1, 0.1, 1.0],
+                              10)
     
+    grass = ObjRender(0, -3, 0)
+    grass.RenderCube(20, 1.5, 20, 165, 245, 96, grass_matirial)
+    
+    fence_material = Material(
+    [0.2, 0.15, 0.1, 1.0],  # Ambiente (marrom escuro)
+    [0.4, 0.3, 0.2, 1.0],   # Difusa (marrom médio)
+    [0.1, 0.1, 0.1, 1.0],   # Especular (pouco brilho)
+    20.0                    # Brilho (baixo)
+    )
+
     fence = ObjRender(-19, 0, 0)
-    fence.RenderCube(1, 2, 20, 100, 100, 100)
-    bush_back= ObjRender(-19, 0, -40)
-    bush_back.RenderCube(1, 1.5, 10, 31, 48, 32)
+    fence.RenderCube(1, 2, 20, 100, 100, 100, fence_material)
+    
+    bush_material = Material(
+    [0.1, 0.2, 0.1, 1.0],  # Ambiente (verde escuro)
+    [0.2, 0.4, 0.2, 1.0],  # Difusa (verde médio)
+    [0.05, 0.05, 0.05, 1.0],  # Especular (quase sem brilho)
+    10.0                   # Brilho (muito baixo)
+    )
+
+    bush_back = ObjRender(-19, 0, -40)
+    bush_back.RenderCube(1, 1.5, 10, 31, 48, 32, bush_material)
+
     bush_front = ObjRender(19, 0, -40)
-    bush_front.RenderCube(1, 1.5, 10, 31, 48, 32)
+    bush_front.RenderCube(1, 1.5, 10, 31, 48, 32, bush_material)
 
-    house = ObjRender(0, 0, 25) #casa
-    house.RenderCube(20, 5, 5, 238, 223, 190)
+    house_material = Material(
+        [0.3, 0.3, 0.3, 1.0],  # Ambiente (cinza claro)
+        [0.8, 0.8, 0.8, 1.0],  # Difusa (branco suave)
+        [0.2, 0.2, 0.2, 1.0],  # Especular (brilho moderado)
+        50.0                   # Brilho (moderado)
+    )
 
-    roof = ObjRender(0, 10, 25) #telhado
-    roof.RenderPrismaTriangular(20, 5, 8, 191, 62, 33)
+    house = ObjRender(0, 0, 25)
+    house.RenderCube(20, 5, 5, 238, 223, 190, house_material)
 
-    road = ObjRender(0, -3, -25) # estrada
-    road.RenderCube(20, 1.5, 5, 128, 128, 128)
+    roof_material = Material(
+        [0.3, 0.1, 0.1, 1.0],  # Ambiente (vermelho escuro)
+        [0.6, 0.2, 0.2, 1.0],  # Difusa (vermelho médio)
+        [0.3, 0.3, 0.3, 1.0],  # Especular (brilho moderado)
+        30.0                   # Brilho (moderado)
+    )
 
-    underground = ObjRender(0, -3, 25) # terra embaixo da casa
-    underground.RenderCube(20, 1.5, 5, 64, 59, 19)
+    roof = ObjRender(0, 10, 25)
+    roof.RenderPrismaTriangular(20, 5, 8, 191, 62, 33, roof_material)
+    
+    road_material = Material(
+        [0.1, 0.1, 0.1, 1.0],  # Ambiente (cinza escuro)
+        [0.3, 0.3, 0.3, 1.0],  # Difusa (cinza médio)
+        [0.05, 0.05, 0.05, 1.0],  # Especular (quase sem brilho)
+        10.0                   # Brilho (muito baixo)
+    )
 
-    cemetery = ObjRender(0, -3, -40) # cemiterio
-    cemetery.RenderCube(20, 1.5, 10, 64, 59, 19)
+    road = ObjRender(0, -3, -25)
+    road.RenderCube(20, 1.5, 5, 128, 128, 128, road_material)
+    
+    underground_material = Material(
+        [0.2, 0.15, 0.1, 1.0],  # Ambiente (marrom escuro)
+        [0.4, 0.3, 0.2, 1.0],   # Difusa (marrom médio)
+        [0.05, 0.05, 0.05, 1.0],  # Especular (quase sem brilho)
+        10.0                   # Brilho (muito baixo)
+    )
+
+    underground = ObjRender(0, -3, 25)
+    underground.RenderCube(20, 1.5, 5, 64, 59, 19, underground_material)
+    
+    cemetery_material = Material(
+        [0.1, 0.1, 0.1, 1.0],  # Ambiente (cinza escuro)
+        [0.2, 0.2, 0.2, 1.0],  # Difusa (cinza médio)
+        [0.05, 0.05, 0.05, 1.0],  # Especular (quase sem brilho)
+        10.0                   # Brilho (muito baixo)
+    )
+
+    cemetery = ObjRender(0, -3, -40)
+    cemetery.RenderCube(20, 1.5, 10, 64, 59, 19, cemetery_material)
 
     player = Player(x, y, z)
     player.render()
@@ -120,8 +198,6 @@ def render():
     for s in shoots:
         s.render()
 
-# Função de mover o player        
-    # Renderizar e mover os zumbis
     for zombie in zombies:
         zombie.spawn()
         zombie.move()  # função de movimentação
@@ -172,14 +248,12 @@ def planting(type):
     # Se não tiver planta
     if type == "Peashooter":
         new_plant = Peashooter(x, y, z, 100, 10)
-        plants.append(new_plant)
     elif type == "Potato":
-        new_plant = Potato(x, y, z, 100, 10)
-        plants.append(new_plant)
+        new_plant = Potato(x, y, z, 1000, 0)
+    elif type == "CherryBomb":
+        new_plant = CherryBomb(x, y, z, 1, 1000)
 
-
-# Função de controle do teclado
-            z = max(z - distancia_movimento, limite_z_negativo)
+    plants.append(new_plant)
 
 def keyboard(window, key, scancode, action, mods):
     global keys
@@ -201,19 +275,12 @@ def keyboard(window, key, scancode, action, mods):
             planting("Peashooter")
         if key == glfw.KEY_2:
             planting("Potato")
+        if key == glfw.KEY_3:
+            planting("CherryBomb")
         
         # Câmera
         if key == glfw.KEY_ENTER:
-            moveCam()
-        
-    
-    if action == glfw.PRESS and key == glfw.KEY_1:
-        plantar()
-
-
-def plantar():
-    planta = Peashooter(x, y, z, 100, 10, 5)
-    plantas.append(planta)
+            moveCam()    
 
 def spawn_zombie():
     zombie = Zombie(10, 10, 0.05)  # vida, dano e velocidade
@@ -229,11 +296,6 @@ def main():
     # Looping principal do código                                
     glfw.set_key_callback(window, keyboard)                        
     initialize()   
-
-    spawn_zombie()
-    spawn_zombie()
-    spawn_zombie()
-    spawn_zombie()
 
     while not glfw.window_should_close(window):                     
         glfw.poll_events()                                                          
