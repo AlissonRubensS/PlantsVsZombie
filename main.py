@@ -47,7 +47,7 @@ luz_ambiente  =  [0.5, 0.5, 0.5, 1.0]  # Luz ambiente mais forte
 luz_difusa    =  [0.5, 0.5, 0.5, 1.0]  # Luz difusa no máximo
 luz_especualr =  [0.5, 0.5, 0.5, 1.0] # Luz especular
 posicao_luz   =  [40, 30, -40, 1.0]  # Posição da luz
-=======
+
 # Variáveis Globais
 x, y, z = 15, 0, 15 
 veloc = 0.050
