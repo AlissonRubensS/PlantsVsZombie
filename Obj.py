@@ -1,8 +1,8 @@
 from OpenGL.GL import *
-import math
 
 # Classe "Mãe"
 class ObjRender:
+
     def __init__(self, x, y, z):
         # Adicionar os pontos centrais 
         self.x = x
@@ -12,7 +12,7 @@ class ObjRender:
     def getPos(self):
         return (self.x, self.y, self.z)
     
-    def RenderCube(self, width, height, depth, r, g, b):
+    def RenderCube(self, width, height, depth, r, g, b, material):
         # Adicionar as cores
         r = r / 255
         g = g / 255
@@ -38,6 +38,26 @@ class ObjRender:
             [3, 2, 6, 7], # Lado esquerdo
         ]
 
+        normal = [
+            [ 0,  0, -1], # Frente
+            [ 0,  0,  1], # Trás
+            [ 0,  1,  0], # Topo
+            [ 0, -1,  0], # Fundo
+            [ 1,  0,  0], # Lado direito
+            [-1,  0,  0], # Lado esquerdo
+        ]
+
+        # Coordenadas de textura para cada face
+        tex_coords = [
+            [0, 0], [1, 0], [1, 1], [0, 1]  # Coordenadas de textura para cada vértice
+        ]
+
+        # Adicionar as propriedades do material
+        glMaterialfv(GL_FRONT, GL_AMBIENT, material.coeficiente_ambiente)
+        glMaterialfv(GL_FRONT, GL_DIFFUSE, material.coeficiente_difuso)
+        glMaterialfv(GL_FRONT, GL_SPECULAR, material.coeficiente_especular)
+        glMaterialf(GL_FRONT, GL_SHININESS, material.brilho)
+        
         # Transformações
         glPushMatrix()
         glTranslatef(self.x, self.y + height, self.z)
@@ -47,68 +67,15 @@ class ObjRender:
         glPolygonMode(GL_FRONT_AND_BACK, GL_FILL)
         glColor3f(r, g, b)
         glBegin(GL_QUADS)
-        for strip in faces:
-            for vid in strip:
-                glVertex3fv(vertex[vid])
-        glEnd()
-
-        # Renderizar contornos
-        glPolygonMode(GL_FRONT_AND_BACK, GL_LINE)
-        glColor3f(0, 0, 0)
-        glBegin(GL_QUADS)
-        for strip in faces:
-            for vid in strip:
+        for strip, n in zip(faces, normal):
+            glNormal3fv(n)
+            for i, vid in enumerate(strip):
+                glTexCoord2fv(tex_coords[i])  # Define as coordenadas de textura
                 glVertex3fv(vertex[vid])
         glEnd()
         glPopMatrix()
 
-    def RenderTriangle(self, base, height, r, g, b):
-        # Adicionar as cores
-        r = r / 255
-        g = g / 255
-        b = b / 255
-
-        vertex = [
-            [ 1, -1,  0],
-            [ 1,  1,  0],
-            [-1,  0,  0],
-            [ 0,  0,  1],
-        ]
-
-        faces = [
-            [0, 1, 2],
-            [0, 1, 3],
-            [0, 2, 3],
-            [1, 2, 3],
-        ]
-
-        glPushMatrix()
-
-        glTranslatef(r, g, b)
-        glScalef(base/2, height, base/2)
-        glRotatef(-90, 1, 0, 0)
-
-        # Renderizar preenchimentos
-        glPolygonMode(GL_FRONT_AND_BACK, GL_FILL)
-        glColor3f(r, g, b)
-        glBegin(GL_TRIANGLES)
-        for strip in faces:
-            for vid in strip:
-                glVertex3fv(vertex[vid])
-        glEnd()
-
-        # Renderizar contornos
-        glPolygonMode(GL_FRONT_AND_BACK, GL_LINE)
-        glColor3f(0, 0, 0)
-        glBegin(GL_TRIANGLES)
-        for strip in faces:
-            for vid in strip:
-                glVertex3fv(vertex[vid])
-
-        glEnd()
-        glPopMatrix()
-
-    def RenderPrismaTriangular(self, base, depth, height, r, g, b):
+    def RenderPrismaTriangular(self, base, depth, height, r, g, b, material):
         r, g, b = r / 255, g / 255, b / 255
 
         # Vértices do prisma triangular
@@ -128,37 +95,34 @@ class ObjRender:
             [2, 0, 3, 5],  # Face retangular esquerda
         ]
 
+        normal = [
+            [0, 0, -1], [0, 0, 1],  # Bases triangulares
+            [0, -1, 0], [1, 0, 0], [0, 1, 0]  # Faces retangulares
+        ]
+
+        # Adicionar as propriedades do material
+        glMaterialfv(GL_FRONT, GL_AMBIENT, material.coeficiente_ambiente)
+        glMaterialfv(GL_FRONT, GL_DIFFUSE, material.coeficiente_difuso)
+        glMaterialfv(GL_FRONT, GL_SPECULAR, material.coeficiente_especular)
+        glMaterialf(GL_FRONT, GL_SHININESS, material.brilho)
+
         glPushMatrix()
-        glTranslatef(self.x, self.y, self.z)
+        glTranslatef(self.x, self.y, self.z)    
 
         # Preenchimento
         glPolygonMode(GL_FRONT_AND_BACK, GL_FILL)
         glColor3f(r, g, b)
         glBegin(GL_TRIANGLES)
-        for face in faces[:2]:  # Desenha as bases triangulares
+        for face, n in zip(faces[:2], normal[:2]):  # Desenha as bases triangulares
+            glNormal3fv(n)
             for vid in face:
                 glVertex3fv(vertex[vid])
         glEnd()
 
         glBegin(GL_QUADS)
-        for face in faces[2:]:  # Desenha as faces retangulares
+        for face, n in zip(faces[2:], normal[2:]):  # Desenha as faces retangulares
+            glNormal3fv(n)
             for vid in face:
                 glVertex3fv(vertex[vid])
         glEnd()
-
-        # Contornos
-        glPolygonMode(GL_FRONT_AND_BACK, GL_LINE)
-        glColor3f(0, 0, 0)
-        glBegin(GL_TRIANGLES)
-        for face in faces[:2]:  
-            for vid in face:
-                glVertex3fv(vertex[vid])
-        glEnd()
-
-        glBegin(GL_QUADS)
-        for face in faces[2:]:
-            for vid in face:
-                glVertex3fv(vertex[vid])
-        glEnd()
-
         glPopMatrix()
