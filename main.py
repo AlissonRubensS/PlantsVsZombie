@@ -15,7 +15,7 @@ from Potato import Potato
 from Shoot import Shoot
 from CherryBomb import CherryBomb
 from Material import Material
-from Zombie import* 
+
 
 # Variáveis Globais
 
@@ -47,13 +47,6 @@ luz_ambiente  =  [0.5, 0.5, 0.5, 1.0]  # Luz ambiente mais forte
 luz_difusa    =  [0.5, 0.5, 0.5, 1.0]  # Luz difusa no máximo
 luz_especualr =  [0.5, 0.5, 0.5, 1.0] # Luz especular
 posicao_luz   =  [40, 30, -40, 1.0]  # Posição da luz
-=======
-# Variáveis Globais
-x, y, z = 15, 0, 15 
-veloc = 0.050
-
-plantas = []
-zombies = []  # Lista para armazenar os zumbis
 
 # Init
 def initialize():
@@ -84,7 +77,6 @@ def update():
             shoots.remove(s)
 
     mover_camera_posicao()
-    glEnable(GL_DEPTH_TEST)
 
 # Função que desenha na tela
 def render():
@@ -102,12 +94,8 @@ def render():
                *posicao_atual_camera[3:],     # Foco da camera
                 0,   1 , 0  )                 # Vetor Up
    
-    glLoadIdentity()              
-    gluLookAt(100, 20, 0, 
-              0, 0, 0, 
-              0, 1, 0)
-
-    # Renderização de objetos na cena    
+    # Renderização de objetos na cena
+    
     grass_matirial = Material([0.1, 0.3, 0.1, 1.0], 
                               [0.2, 0.6, 0.2, 1.0], 
                               [0.1, 0.1, 0.1, 1.0],
@@ -115,6 +103,7 @@ def render():
     
     grass = ObjRender(0, -3, 0)
     grass.RenderCube(20, 1.5, 20, 165, 245, 96, grass_matirial)
+    
     
     fence_material = Material(
     [0.2, 0.15, 0.1, 1.0],  # Ambiente (marrom escuro)
@@ -198,24 +187,19 @@ def render():
     for s in shoots:
         s.render()
 
-    for zombie in zombies:
-        zombie.spawn()
-        zombie.move()  # função de movimentação
-
+# Função de mover o player        
 def mover(eixo, polaridade):
     global x,y,z
-    global x, y, z
-    print(x, y, z)
 
-    distancia_movimento = 10
+    distancia_movimento = 5
     if eixo:
         if polaridade:
             x = min(distancia_movimento + x, limite_x_positivo)
         else:
-            x = max(x - distancia_movimento, limite_x_negativo)
+            x = max( x - distancia_movimento,limite_x_negativo)
     else:
         if polaridade:
-            z = min(distancia_movimento + z, limite_z_positivo)
+            z = min(distancia_movimento + z,limite_z_positivo)
         else:
             z = max(z - distancia_movimento,limite_z_negativo)
 
@@ -255,6 +239,7 @@ def planting(type):
 
     plants.append(new_plant)
 
+# Função de controle do teclado
 def keyboard(window, key, scancode, action, mods):
     global keys
 
@@ -281,22 +266,15 @@ def keyboard(window, key, scancode, action, mods):
         # Câmera
         if key == glfw.KEY_ENTER:
             moveCam()    
-
-def spawn_zombie():
-    zombie = Zombie(10, 10, 0.05)  # vida, dano e velocidade
-    zombies.append(zombie)
-
+    
 def main():
     glfw.init()                                                      
-    window = glfw.create_window(800, 800, 'PVZ', None, None)
+    window = glfw.create_window(800,800,'PVZ',None,None)
     glfw.make_context_current(window)       
     glfw.set_key_callback(window,keyboard)                        
     initialize()                    
 
     # Looping principal do código                                
-    glfw.set_key_callback(window, keyboard)                        
-    initialize()   
-
     while not glfw.window_should_close(window):                     
         glfw.poll_events()                                                          
         update()
