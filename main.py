@@ -5,6 +5,7 @@
 import glfw
 from OpenGL.GL import *
 from OpenGL.GLU import * 
+from math import sqrt
 import time
 
 # Classes
@@ -15,6 +16,7 @@ from Potato import Potato
 from Shoot import Shoot
 from CherryBomb import CherryBomb
 from Material import Material
+from Zombie import Zombie
 
 
 # Variáveis Globais
@@ -25,24 +27,29 @@ limite_x_negativo = -15
 limite_z_positivo = 15
 limite_z_negativo = -15
 
+# temporizadores
+spawn_cooldown = 10
+last_zumbie_spawn = 0
+
 # Posições iniciais
 x, y, z = 0, 0, 0 
-plants = []
-shoots = []
-
 Cams = {
     "1" : [40, 30, -40, -40, 0, 40],
     "2" : [0, 50, 40, 0, 10, 0],
     "3" : [-40, 15, 30, 40, 0, -40],
 }
-index = "1"
+index = "2"
 
 posicao_atual_camera = list(Cams[index])
 posicao_alvo_camera = list(Cams[index])
 velociade_camera = 0.005
 
-# Iluminação
+# Vetores de Objetos
+shoots = []
+plants = []
+zumbies = []
 
+# Iluminação
 luz_ambiente  =  [0.5, 0.5, 0.5, 1.0]  # Luz ambiente mais forte
 luz_difusa    =  [0.5, 0.5, 0.5, 1.0]  # Luz difusa no máximo
 luz_especualr =  [0.5, 0.5, 0.5, 1.0] # Luz especular
@@ -63,21 +70,55 @@ def initialize():
 
 # Função para alterações do código
 def update():
-    for p in plants:
-        if p.type == "Peashooter" and time.time() - p.time_init  > 10:
-            px, py, pz = p.getPos()
-            shoots.append(Shoot(px, py + 4, pz))
-            p.time_init = time.time()
-        if p.type == "CherryBomb" and time.time() - p.time_init  > 2:
-            plants.remove(p)
+    global last_zumbie_spawn, spawn_cooldown
+    current_time = time.time()
 
-    
-    for s in shoots:
-        if s.z < -45:
+    # Lógica dos tiros
+    for s in shoots.copy():
+        if s.z < -25:
             shoots.remove(s)
+        else:
+            for zumbie in zumbies.copy():
+                if colision(s, zumbie, 5):
+                    if s in shoots: shoots.remove(s)
+                    zumbie.hp -= s.demage
+                    print(zumbie.hp)
+                    if zumbie.hp <= 0:
+                        zumbies.remove(zumbie)
+
+    # Lógica das plantas
+    for p in plants.copy():
+        if p.type == "Peashooter" and current_time - p.time_init  > 10:
+            px, py, pz = p.getPos()
+            shoots.append(Shoot(px, py + 4, pz, p.demage))
+            p.time_init = time.time()
+        if p.type == "CherryBomb" and current_time - p.time_init  > 2:
+            plants.remove(p) 
+
+    # Lógica dos Zumbies
+    dps = time.time()
+    for zumbie in zumbies.copy():
+        colidiu = False  # Flag para verificar se o zumbi colidiu com alguma planta
+        for p in plants.copy():
+            if colision(p, zumbie, 5):
+                colidiu = True  # O zumbi colidiu, então ele não deve se mover
+                if time.time() - dps >= 1:
+                    p.hp -= zumbie.damage
+                    dps = time.time()
+
+                if p.hp <= 0:
+                    plants.remove(p)
+        
+        if not colidiu:  # Só move se não colidiu com nenhuma planta
+            zumbie.move()
+
+            
+    if current_time - last_zumbie_spawn >= spawn_cooldown:
+        zumbies.append(Zombie(100, 20, 0.01))
+        last_zumbie_spawn = time.time()
 
     mover_camera_posicao()
-
+    
 # Função que desenha na tela
 def render():
     # Definição do espaço
@@ -95,7 +136,6 @@ def render():
                 0,   1 , 0  )                 # Vetor Up
    
     # Renderização de objetos na cena
-    
     grass_matirial = Material([0.1, 0.3, 0.1, 1.0], 
                               [0.2, 0.6, 0.2, 1.0], 
                               [0.1, 0.1, 0.1, 1.0],
@@ -187,6 +227,9 @@ def render():
     for s in shoots:
         s.render()
 
+    for zombie in zumbies:
+        zombie.render()
+
 # Função de mover o player        
 def mover(eixo, polaridade):
     global x,y,z
@@ -231,13 +274,22 @@ def planting(type):
     
     # Se não tiver planta
     if type == "Peashooter":
-        new_plant = Peashooter(x, y, z, 100, 10)
+        new_plant = Peashooter(x, y, z, 100, 25)
     elif type == "Potato":
-        new_plant = Potato(x, y, z, 1000, 0)
+        new_plant = Potato(x, y, z, 250, 0)
     elif type == "CherryBomb":
         new_plant = CherryBomb(x, y, z, 1, 1000)
 
     plants.append(new_plant)
+
+# função para detectar colisão
+def colision(obj1, obj2, distance_min):
+    x1, y1, z1 = obj1.getPos()
+    x2, y2, z2 = obj2.getPos()
+    distance = sqrt( (x2-x1) ** 2 + (y2-y1) ** 2 + (z2-z1) ** 2)
+    if distance <= distance_min:
+        return True
+    return False
 
 # Função de controle do teclado
 def keyboard(window, key, scancode, action, mods):
@@ -272,7 +324,7 @@ def main():
     window = glfw.create_window(800,800,'PVZ',None,None)
     glfw.make_context_current(window)       
     glfw.set_key_callback(window,keyboard)                        
-    initialize()                    
+    initialize()       
 
     # Looping principal do código                                
     while not glfw.window_should_close(window):                     
