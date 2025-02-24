@@ -15,7 +15,7 @@ from Potato import Potato
 from Shoot import Shoot
 from CherryBomb import CherryBomb
 from Material import Material
-from textura import TextureLoader  
+from textura import Textura
 
 
 
@@ -80,14 +80,6 @@ def update():
     mover_camera_posicao()
 
 # Função que desenha na tela
-
-
-# Carregar as texturas
-texture_manager = TextureLoader()
-#grass_texture = texture_manager.load_texture("texturas/grass.jpg")
-fence_texture = texture_manager.load_texture("texturas/cerca.jpg")
-#house_texture = texture_manager.load_texture("texturas/house.jpg"
-                                             
 def render():
     # Definição do espaço
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)   
@@ -105,17 +97,25 @@ def render():
    
     # Renderização de objetos na cena
     
-    grass_matirial = Material([0.1, 0.3, 0.1, 1.0], 
+    # Renderização do skybox
+    # skybox = ObjRender(0, 0, 0)  # Posição do skybox (centro da cena)
+    # skybox.RenderSkybox(skybox_textures, 50)  # Tamanho do skybox
+    
+    glEnable(GL_TEXTURE_2D)
+
+    glBindTexture(GL_TEXTURE_2D, grass_texture)
+    grass_material = Material([0.1, 0.3, 0.1, 1.0], 
                               [0.2, 0.6, 0.2, 1.0], 
                               [0.1, 0.1, 0.1, 1.0],
                               10)
     
     grass = ObjRender(0, -3, 0)
-    grass.RenderCube(20, 1.5, 20, 165, 245, 96, grass_matirial)
+    grass.RenderCube(20, 1.5, 20, 165, 245, 96, grass_material)
+    glDisable(GL_TEXTURE_2D)
     
-    
-    # Cerca
+    # casa e campo de batalha
     glEnable(GL_TEXTURE_2D)
+
     glBindTexture(GL_TEXTURE_2D, fence_texture)
     fence_material = Material(
         [0.2, 0.15, 0.1, 1.0],  # Ambiente (marrom escuro)
@@ -124,23 +124,15 @@ def render():
         20.0                    # Brilho (baixo)
     )
 
-    fence = ObjRender(-19, 0, 0)
-    fence.RenderCube(1, 2, 20, 100, 100, 100, fence_material)
+    fence_d = ObjRender(-19.8, 0, 0)
+    fence_d.RenderCube(0.2, 2, 20, 250, 250, 250, fence_material)    
+    fence_e = ObjRender(19.8, 0, 0)
+    fence_e.RenderCube(0.2, 2, 20, 250, 250, 250, fence_material)
     glDisable(GL_TEXTURE_2D)
 
-    bush_material = Material(
-    [0.1, 0.2, 0.1, 1.0],  # Ambiente (verde escuro)
-    [0.2, 0.4, 0.2, 1.0],  # Difusa (verde médio)
-    [0.05, 0.05, 0.05, 1.0],  # Especular (quase sem brilho)
-    10.0                   # Brilho (muito baixo)
-    )
+    glEnable(GL_TEXTURE_2D)
 
-    bush_back = ObjRender(-19, 0, -40)
-    bush_back.RenderCube(1, 1.5, 10, 31, 48, 32, bush_material)
-
-    bush_front = ObjRender(19, 0, -40)
-    bush_front.RenderCube(1, 1.5, 10, 31, 48, 32, bush_material)
-
+    glBindTexture(GL_TEXTURE_2D, house_texture)
     house_material = Material(
         [0.3, 0.3, 0.3, 1.0],  # Ambiente (cinza claro)
         [0.8, 0.8, 0.8, 1.0],  # Difusa (branco suave)
@@ -150,7 +142,11 @@ def render():
 
     house = ObjRender(0, 0, 25)
     house.RenderCube(20, 5, 5, 238, 223, 190, house_material)
+    glDisable(GL_TEXTURE_2D)
 
+    glEnable(GL_TEXTURE_2D)
+
+    glBindTexture(GL_TEXTURE_2D, roof_texture)
     roof_material = Material(
         [0.3, 0.1, 0.1, 1.0],  # Ambiente (vermelho escuro)
         [0.6, 0.2, 0.2, 1.0],  # Difusa (vermelho médio)
@@ -160,7 +156,12 @@ def render():
 
     roof = ObjRender(0, 10, 25)
     roof.RenderPrismaTriangular(20, 5, 8, 191, 62, 33, roof_material)
+    glDisable(GL_TEXTURE_2D)   
     
+    
+    glEnable(GL_TEXTURE_2D)
+
+    glBindTexture(GL_TEXTURE_2D, road_texture)
     road_material = Material(
         [0.1, 0.1, 0.1, 1.0],  # Ambiente (cinza escuro)
         [0.3, 0.3, 0.3, 1.0],  # Difusa (cinza médio)
@@ -169,7 +170,9 @@ def render():
     )
 
     road = ObjRender(0, -3, -25)
-    road.RenderCube(20, 1.5, 5, 128, 128, 128, road_material)
+    road.RenderCube(20, 1.5, 5, 112, 124, 77, road_material)
+
+    glDisable(GL_TEXTURE_2D)
     
     underground_material = Material(
         [0.2, 0.15, 0.1, 1.0],  # Ambiente (marrom escuro)
@@ -177,10 +180,16 @@ def render():
         [0.05, 0.05, 0.05, 1.0],  # Especular (quase sem brilho)
         10.0                   # Brilho (muito baixo)
     )
+    
 
     underground = ObjRender(0, -3, 25)
     underground.RenderCube(20, 1.5, 5, 64, 59, 19, underground_material)
-    
+
+
+    glEnable(GL_TEXTURE_2D)
+
+    # cemiterio e os tumulos
+    glBindTexture(GL_TEXTURE_2D, cemetery_texture)   
     cemetery_material = Material(
         [0.1, 0.1, 0.1, 1.0],  # Ambiente (cinza escuro)
         [0.2, 0.2, 0.2, 1.0],  # Difusa (cinza médio)
@@ -190,6 +199,56 @@ def render():
 
     cemetery = ObjRender(0, -3, -40)
     cemetery.RenderCube(20, 1.5, 10, 64, 59, 19, cemetery_material)
+    glDisable(GL_TEXTURE_2D)
+    
+    glEnable(GL_TEXTURE_2D)
+
+    glBindTexture(GL_TEXTURE_2D, bush_texture)
+    bush_material = Material(
+    [0.1, 0.2, 0.1, 1.0],  # Ambiente (verde escuro)
+    [0.2, 0.4, 0.2, 1.0],  # Difusa (verde médio)
+    [0.05, 0.05, 0.05, 1.0],  # Especular (quase sem brilho)
+    10.0                   # Brilho (muito baixo)
+    )
+
+    bush_d = ObjRender(-19, 0, -40)
+    bush_d.RenderCube(1, 1.5, 10, 255, 255, 255, bush_material)    
+    
+    bush_back = ObjRender(0, 0, -50)
+    bush_back.RenderCube(20, 1.5, 1, 255, 255, 255, bush_material)
+
+    bush_e = ObjRender(19, 0, -40)
+    bush_e.RenderCube(1, 1.5, 10, 255, 255, 255, bush_material)
+
+    glEnable(GL_BLEND)
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA)
+    glBindTexture(GL_TEXTURE_2D, tombs_texture)
+
+    tomb_positions = [
+        (-15, 0, -38),
+        (-10, 0, -40),
+        (-5, 0, -37),
+        (0, 0, -39),
+        (5, 0, -40),
+        (10, 0, -37),
+        (15, 0, -38)
+    ]
+
+    
+    tombs_material = Material(
+    [0.1, 0.2, 0.1, 1.0],     # Ambiente (verde escuro)
+    [0.2, 0.4, 0.2, 1.0],     # Difusa (verde médio)
+    [0.05, 0.05, 0.05, 1.0],  # Especular (quase sem brilho)
+    10.0                      # Brilho (muito baixo)
+    )
+
+    for pos in tomb_positions:
+        tomb = ObjRender(*pos)
+        tomb.RenderCube(3, 3, 0.01, 0, 0, 0, tombs_material)  
+
+    glDisable(GL_BLEND)  
+    glDisable(GL_TEXTURE_2D)
+
 
     player = Player(x, y, z)
     player.render()
@@ -286,13 +345,32 @@ def main():
     glfw.make_context_current(window)       
     glfw.set_key_callback(window,keyboard)                        
     initialize()                    
-    
-    # Carregar as texturas
-    global grass_texture, fence_texture, house_texture
-    #grass_texture = texture_manager.load_texture("texturas/grass.jpg")
-    fence_texture = texture_manager.load_texture("texturas\cerca.jpg")
-    #house_texture = texture_manager.load_texture("texturas/house.jpg")
-    
+
+    # Carregando as texturas
+    global grass_texture, fence_texture, house_texture, bush_texture, road_texture, cemetery_texture, tombs_texture, roof_texture, skybox
+    # Carregando as texturas
+    texture_manager = Textura()  # Instância da classe Textura
+
+    grass_texture = texture_manager.carregaTextura("texturas/grama.jpg")
+    fence_texture = texture_manager.carregaTextura("texturas/cerca.jpg")
+    bush_texture = texture_manager.carregaTextura("texturas/moitas.jpg")
+    road_texture = texture_manager.carregaTextura("texturas/estrada.jpg")
+    cemetery_texture = texture_manager.carregaTextura("texturas/cemiterio.jpg")
+    tombs_texture = texture_manager.carregaTextura("texturas/tumba.png")
+    roof_texture = texture_manager.carregaTextura("texturas/telhado.jpg")
+    house_texture = texture_manager.carregaTextura("texturas/casa.jpg")
+
+    # skybox_textures = texture_manager.carregaSkybox([
+    #     "texturas/skybox_front.jpg",
+    #     "texturas/skybox_back.jpg",
+    #     "texturas/skybox_left.jpg",
+    #     "texturas/skybox_right.jpg",
+    #     "texturas/skybox_top.jpg",
+    #     "texturas/skybox_bottom.jpg"
+    # ])
+
+
+
     # Looping principal do código                                
     while not glfw.window_should_close(window):                     
         glfw.poll_events()                                                          

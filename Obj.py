@@ -49,7 +49,7 @@ class ObjRender:
 
         # Coordenadas de textura para cada face
         tex_coords = [
-            [0, 0], [1, 0], [1, 1], [0, 1]  # Coordenadas de textura para cada vértice
+            [0, 1], [0, 0], [1,0], [1, 1]  # Coordenadas de textura para cada vértice
         ]
 
         # Adicionar as propriedades do material
@@ -126,3 +126,67 @@ class ObjRender:
                 glVertex3fv(vertex[vid])
         glEnd()
         glPopMatrix()
+
+    def RenderSkybox(self, skybox_textures, size):
+        """
+        Renderiza o skybox como um cubo fechado.
+        """
+        glEnable(GL_TEXTURE_2D)
+        glDisable(GL_LIGHTING)  # Desativa a iluminação para o skybox
+
+        # Frente
+        glBindTexture(GL_TEXTURE_2D, skybox_textures[0])
+        glBegin(GL_QUADS)
+        glTexCoord2f(0, 0); glVertex3f(-size, -size, -size)
+        glTexCoord2f(1, 0); glVertex3f( size, -size, -size)
+        glTexCoord2f(1, 1); glVertex3f( size,  size, -size)
+        glTexCoord2f(0, 1); glVertex3f(-size,  size, -size)
+        glEnd()
+
+        # Trás
+        glBindTexture(GL_TEXTURE_2D, skybox_textures[1])
+        glBegin(GL_QUADS)
+        glTexCoord2f(0, 0); glVertex3f(-size, -size, size)
+        glTexCoord2f(1, 0); glVertex3f( size, -size, size)
+        glTexCoord2f(1, 1); glVertex3f( size,  size, size)
+        glTexCoord2f(0, 1); glVertex3f(-size,  size, size)
+        glEnd()
+
+        # Esquerda
+        glBindTexture(GL_TEXTURE_2D, skybox_textures[2])
+        glBegin(GL_QUADS)
+        glTexCoord2f(0, 0); glVertex3f(-size, -size, -size)
+        glTexCoord2f(1, 0); glVertex3f(-size, -size,  size)
+        glTexCoord2f(1, 1); glVertex3f(-size,  size,  size)
+        glTexCoord2f(0, 1); glVertex3f(-size,  size, -size)
+        glEnd()
+
+        # Direita
+        glBindTexture(GL_TEXTURE_2D, skybox_textures[3])
+        glBegin(GL_QUADS)
+        glTexCoord2f(0, 0); glVertex3f(size, -size, -size)
+        glTexCoord2f(1, 0); glVertex3f(size, -size,  size)
+        glTexCoord2f(1, 1); glVertex3f(size,  size,  size)
+        glTexCoord2f(0, 1); glVertex3f(size,  size, -size)
+        glEnd()
+
+        # Superior
+        glBindTexture(GL_TEXTURE_2D, skybox_textures[4])
+        glBegin(GL_QUADS)
+        glTexCoord2f(0, 0); glVertex3f(-size,  size, -size)
+        glTexCoord2f(1, 0); glVertex3f( size,  size, -size)
+        glTexCoord2f(1, 1); glVertex3f( size,  size,  size)
+        glTexCoord2f(0, 1); glVertex3f(-size,  size,  size)
+        glEnd()
+
+        # Inferior
+        glBindTexture(GL_TEXTURE_2D, skybox_textures[5])
+        glBegin(GL_QUADS)
+        glTexCoord2f(0, 0); glVertex3f(-size, -size, -size)
+        glTexCoord2f(1, 0); glVertex3f( size, -size, -size)
+        glTexCoord2f(1, 1); glVertex3f( size, -size,  size)
+        glTexCoord2f(0, 1); glVertex3f(-size, -size,  size)
+        glEnd()
+
+        glEnable(GL_LIGHTING)  # Reativa a iluminação
+        glDisable(GL_TEXTURE_2D)
