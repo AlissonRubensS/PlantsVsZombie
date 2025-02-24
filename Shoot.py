@@ -4,8 +4,9 @@ from Material import Material
 import time
 
 class Shoot(ObjRender):
-    def __init__(self, x, y, z):
+    def __init__(self, x, y, z, demage):
         super().__init__(x, y, z)
+        self.demage = demage
         self.veloc = 5
         self.start_time = time.time()
 
