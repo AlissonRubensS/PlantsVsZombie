@@ -5,6 +5,10 @@
 import glfw
 from OpenGL.GL import *
 from OpenGL.GLU import * 
+<<<<<<< HEAD
+=======
+from math import sqrt
+>>>>>>> main
 import time
 
 # Classes
@@ -15,35 +19,60 @@ from Potato import Potato
 from Shoot import Shoot
 from CherryBomb import CherryBomb
 from Material import Material
+<<<<<<< HEAD
 from textura import Textura
 
 
 
 # Variáveis Globais
+=======
+from Zombie import Zombie
+
+
+# Variáveis Globais
+
+>>>>>>> main
 # Limites de movimento
 limite_x_positivo = 15
 limite_x_negativo = -15
 limite_z_positivo = 15
 limite_z_negativo = -15
 
+<<<<<<< HEAD
 # Posições iniciais
 x, y, z = 0, 0, 0 
 plants = []
 shoots = []
+=======
+# temporizadores
+spawn_cooldown = 10
+last_zumbie_spawn = 0
+>>>>>>> main
 
+# Posições iniciais
+x, y, z = 0, 0, 0 
 Cams = {
     "1" : [40, 30, -40, -40, 0, 40],
     "2" : [0, 50, 40, 0, 10, 0],
     "3" : [-40, 15, 30, 40, 0, -40],
 }
-index = "1"
+index = "2"
 
 posicao_atual_camera = list(Cams[index])
 posicao_alvo_camera = list(Cams[index])
 velociade_camera = 0.005
 
+<<<<<<< HEAD
 # Iluminação
 
+=======
+# Vetores de Objetos
+shoots = []
+plants = []
+zumbies = []
+
+# Iluminação
+>>>>>>> main
 luz_ambiente  =  [0.5, 0.5, 0.5, 1.0]  # Luz ambiente mais forte
 luz_difusa    =  [0.5, 0.5, 0.5, 1.0]  # Luz difusa no máximo
 luz_especualr =  [0.5, 0.5, 0.5, 1.0] # Luz especular
@@ -64,6 +93,7 @@ def initialize():
 
 # Função para alterações do código
 def update():
+<<<<<<< HEAD
     for p in plants:
         if p.type == "Peashooter" and time.time() - p.time_init  > 10:
             px, py, pz = p.getPos()
@@ -75,10 +105,61 @@ def update():
     
     for s in shoots:
         if s.z < -45:
+=======
+    global last_zumbie_spawn, spawn_cooldown
+    current_time = time.time()
+
+    # Lógica dos tiros
+    for s in shoots.copy():
+        if s.z < -25:
+>>>>>>> main
             shoots.remove(s)
+        else:
+            for zumbie in zumbies.copy():
+                if colision(s, zumbie, 5):
+                    if s in shoots: shoots.remove(s)
+                    zumbie.hp -= s.demage
+                    print(zumbie.hp)
+                    if zumbie.hp <= 0:
+                        zumbies.remove(zumbie)
+
+    # Lógica das plantas
+    for p in plants.copy():
+        if p.type == "Peashooter" and current_time - p.time_init  > 10:
+            px, py, pz = p.getPos()
+            shoots.append(Shoot(px, py + 4, pz, p.demage))
+            p.time_init = time.time()
+        if p.type == "CherryBomb" and current_time - p.time_init  > 2:
+            plants.remove(p) 
+
+    # Lógica dos Zumbies
+    dps = time.time()
+    for zumbie in zumbies.copy():
+        colidiu = False  # Flag para verificar se o zumbi colidiu com alguma planta
+        for p in plants.copy():
+            if colision(p, zumbie, 5):
+                colidiu = True  # O zumbi colidiu, então ele não deve se mover
+                if time.time() - dps >= 1:
+                    p.hp -= zumbie.damage
+                    dps = time.time()
+
+                if p.hp <= 0:
+                    plants.remove(p)
+        
+        if not colidiu:  # Só move se não colidiu com nenhuma planta
+            zumbie.move()
+
+            
+    if current_time - last_zumbie_spawn >= spawn_cooldown:
+        zumbies.append(Zombie(100, 20, 0.01))
+        last_zumbie_spawn = time.time()
 
     mover_camera_posicao()
+<<<<<<< HEAD
 
+=======
+    
+>>>>>>> main
 # Função que desenha na tela
 def render():
     # Definição do espaço
@@ -96,6 +177,7 @@ def render():
                 0,   1 , 0  )                 # Vetor Up
    
     # Renderização de objetos na cena
+<<<<<<< HEAD
     
     # Renderização do skybox
     # skybox = ObjRender(0, 0, 0)  # Posição do skybox (centro da cena)
@@ -162,12 +244,67 @@ def render():
     glEnable(GL_TEXTURE_2D)
 
     glBindTexture(GL_TEXTURE_2D, road_texture)
+=======
+    grass_matirial = Material([0.1, 0.3, 0.1, 1.0], 
+                              [0.2, 0.6, 0.2, 1.0], 
+                              [0.1, 0.1, 0.1, 1.0],
+                              10)
+    
+    grass = ObjRender(0, -3, 0)
+    grass.RenderCube(20, 1.5, 20, 165, 245, 96, grass_matirial)
+    
+    
+    fence_material = Material(
+    [0.2, 0.15, 0.1, 1.0],  # Ambiente (marrom escuro)
+    [0.4, 0.3, 0.2, 1.0],   # Difusa (marrom médio)
+    [0.1, 0.1, 0.1, 1.0],   # Especular (pouco brilho)
+    20.0                    # Brilho (baixo)
+    )
+
+    fence = ObjRender(-19, 0, 0)
+    fence.RenderCube(1, 2, 20, 100, 100, 100, fence_material)
+    
+    bush_material = Material(
+    [0.1, 0.2, 0.1, 1.0],  # Ambiente (verde escuro)
+    [0.2, 0.4, 0.2, 1.0],  # Difusa (verde médio)
+    [0.05, 0.05, 0.05, 1.0],  # Especular (quase sem brilho)
+    10.0                   # Brilho (muito baixo)
+    )
+
+    bush_back = ObjRender(-19, 0, -40)
+    bush_back.RenderCube(1, 1.5, 10, 31, 48, 32, bush_material)
+
+    bush_front = ObjRender(19, 0, -40)
+    bush_front.RenderCube(1, 1.5, 10, 31, 48, 32, bush_material)
+
+    house_material = Material(
+        [0.3, 0.3, 0.3, 1.0],  # Ambiente (cinza claro)
+        [0.8, 0.8, 0.8, 1.0],  # Difusa (branco suave)
+        [0.2, 0.2, 0.2, 1.0],  # Especular (brilho moderado)
+        50.0                   # Brilho (moderado)
+    )
+
+    house = ObjRender(0, 0, 25)
+    house.RenderCube(20, 5, 5, 238, 223, 190, house_material)
+
+    roof_material = Material(
+        [0.3, 0.1, 0.1, 1.0],  # Ambiente (vermelho escuro)
+        [0.6, 0.2, 0.2, 1.0],  # Difusa (vermelho médio)
+        [0.3, 0.3, 0.3, 1.0],  # Especular (brilho moderado)
+        30.0                   # Brilho (moderado)
+    )
+
+    roof = ObjRender(0, 10, 25)
+    roof.RenderPrismaTriangular(20, 5, 8, 191, 62, 33, roof_material)
+    
+>>>>>>> main
     road_material = Material(
         [0.1, 0.1, 0.1, 1.0],  # Ambiente (cinza escuro)
         [0.3, 0.3, 0.3, 1.0],  # Difusa (cinza médio)
         [0.05, 0.05, 0.05, 1.0],  # Especular (quase sem brilho)
         10.0                   # Brilho (muito baixo)
     )
+<<<<<<< HEAD
 
     road = ObjRender(0, -3, -25)
     road.RenderCube(20, 1.5, 5, 112, 124, 77, road_material)
@@ -249,6 +386,31 @@ def render():
     glDisable(GL_BLEND)  
     glDisable(GL_TEXTURE_2D)
 
+=======
+
+    road = ObjRender(0, -3, -25)
+    road.RenderCube(20, 1.5, 5, 128, 128, 128, road_material)
+    
+    underground_material = Material(
+        [0.2, 0.15, 0.1, 1.0],  # Ambiente (marrom escuro)
+        [0.4, 0.3, 0.2, 1.0],   # Difusa (marrom médio)
+        [0.05, 0.05, 0.05, 1.0],  # Especular (quase sem brilho)
+        10.0                   # Brilho (muito baixo)
+    )
+
+    underground = ObjRender(0, -3, 25)
+    underground.RenderCube(20, 1.5, 5, 64, 59, 19, underground_material)
+    
+    cemetery_material = Material(
+        [0.1, 0.1, 0.1, 1.0],  # Ambiente (cinza escuro)
+        [0.2, 0.2, 0.2, 1.0],  # Difusa (cinza médio)
+        [0.05, 0.05, 0.05, 1.0],  # Especular (quase sem brilho)
+        10.0                   # Brilho (muito baixo)
+    )
+
+    cemetery = ObjRender(0, -3, -40)
+    cemetery.RenderCube(20, 1.5, 10, 64, 59, 19, cemetery_material)
+>>>>>>> main
 
     player = Player(x, y, z)
     player.render()
@@ -259,6 +421,12 @@ def render():
     for s in shoots:
         s.render()
 
+<<<<<<< HEAD
+=======
+    for zombie in zumbies:
+        zombie.render()
+
+>>>>>>> main
 # Função de mover o player        
 def mover(eixo, polaridade):
     global x,y,z
@@ -303,13 +471,31 @@ def planting(type):
     
     # Se não tiver planta
     if type == "Peashooter":
+<<<<<<< HEAD
         new_plant = Peashooter(x, y, z, 100, 10)
     elif type == "Potato":
         new_plant = Potato(x, y, z, 1000, 0)
+=======
+        new_plant = Peashooter(x, y, z, 100, 25)
+    elif type == "Potato":
+        new_plant = Potato(x, y, z, 250, 0)
+>>>>>>> main
     elif type == "CherryBomb":
         new_plant = CherryBomb(x, y, z, 1, 1000)
 
     plants.append(new_plant)
+<<<<<<< HEAD
+=======
+
+# função para detectar colisão
+def colision(obj1, obj2, distance_min):
+    x1, y1, z1 = obj1.getPos()
+    x2, y2, z2 = obj2.getPos()
+    distance = sqrt( (x2-x1) ** 2 + (y2-y1) ** 2 + (z2-z1) ** 2)
+    if distance <= distance_min:
+        return True
+    return False
+>>>>>>> main
 
 # Função de controle do teclado
 def keyboard(window, key, scancode, action, mods):
@@ -344,7 +530,7 @@ def main():
     window = glfw.create_window(800,800,'PVZ',None,None)
     glfw.make_context_current(window)       
     glfw.set_key_callback(window,keyboard)                        
-    initialize()                    
+    initialize()       
 
     # Carregando as texturas
     global grass_texture, fence_texture, house_texture, bush_texture, road_texture, cemetery_texture, tombs_texture, roof_texture, skybox

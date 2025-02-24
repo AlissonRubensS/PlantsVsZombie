@@ -1,6 +1,8 @@
 from OpenGL.GL import *
 from Obj import ObjRender
+from Material import Material
 import random
+<<<<<<< HEAD
 
 # Classe de material para armazenar coeficientes de iluminação
 class Material:
@@ -9,6 +11,8 @@ class Material:
         self.coeficiente_difuso = difuso
         self.coeficiente_especular = especular
         self.brilho = brilho
+=======
+>>>>>>> main
 
 class Zombie(ObjRender):
     
@@ -29,6 +33,7 @@ class Zombie(ObjRender):
 
         # Criando um material para o zumbi (valores ajustáveis)
         self.material = Material(
+<<<<<<< HEAD
             ambiente=(0.2, 0.2, 0.2, 1.0),
             difuso=(0.0, 0.5, 0.0, 1.0),  # Verde escuro
             especular=(0.3, 0.3, 0.3, 1.0),
@@ -38,6 +43,17 @@ class Zombie(ObjRender):
     def spawn(self):
         """Renderiza o zumbi na cena"""
 
+=======
+            ambiente  = (0.2, 0.2, 0.2, 1.0),
+            difuso    = (0.0, 0.5, 0.0, 1.0),  # Verde escuro
+            especular = (0.3, 0.3, 0.3, 1.0),
+            brilho    = 1
+        )
+
+    def render(self):
+        """Renderiza o zumbi na cena"""
+
+>>>>>>> main
         # Corpo do zumbi
         self.RenderCube(1, 1.5, 0.5, 0, 100, 0, self.material)
 
@@ -65,7 +81,11 @@ class Zombie(ObjRender):
         """Movimenta o zumbi em direção ao alvo"""
         dx = self.target_x - self.x
         dz = self.target_z - self.z
+<<<<<<< HEAD
         distancia_quadrado = dx * dx + dz * dz  # Evita sqrt()
+=======
+        distancia_quadrado = dx * dx + dz * dz
+>>>>>>> main
 
         if distancia_quadrado > 0:
             inv_distancia = 1 / (distancia_quadrado ** 0.5)  # Normalização

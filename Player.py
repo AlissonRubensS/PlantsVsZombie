@@ -1,5 +1,6 @@
 from OpenGL.GL import *
 from Obj import ObjRender
+from Material import Material
 
 class Player(ObjRender):
     def __init__(self, x, y, z):

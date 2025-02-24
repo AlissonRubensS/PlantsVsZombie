@@ -47,11 +47,14 @@ class ObjRender:
             [-1,  0,  0], # Lado esquerdo
         ]
 
+<<<<<<< HEAD
         # Coordenadas de textura para cada face
         tex_coords = [
             [0, 1], [0, 0], [1,0], [1, 1]  # Coordenadas de textura para cada vértice
         ]
 
+=======
+>>>>>>> main
         # Adicionar as propriedades do material
         glMaterialfv(GL_FRONT, GL_AMBIENT, material.coeficiente_ambiente)
         glMaterialfv(GL_FRONT, GL_DIFFUSE, material.coeficiente_difuso)
@@ -69,8 +72,12 @@ class ObjRender:
         glBegin(GL_QUADS)
         for strip, n in zip(faces, normal):
             glNormal3fv(n)
+<<<<<<< HEAD
             for i, vid in enumerate(strip):
                 glTexCoord2fv(tex_coords[i])  # Define as coordenadas de textura
+=======
+            for vid in strip:
+>>>>>>> main
                 glVertex3fv(vertex[vid])
         glEnd()
         glPopMatrix()
@@ -125,6 +132,7 @@ class ObjRender:
             for vid in face:
                 glVertex3fv(vertex[vid])
         glEnd()
+<<<<<<< HEAD
         glPopMatrix()
 
     def RenderSkybox(self, skybox_textures, size):
@@ -190,3 +198,6 @@ class ObjRender:
 
         glEnable(GL_LIGHTING)  # Reativa a iluminação
         glDisable(GL_TEXTURE_2D)
+=======
+        glPopMatrix()
+>>>>>>> main
