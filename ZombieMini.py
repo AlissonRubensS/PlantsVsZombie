@@ -3,8 +3,8 @@ from Obj import ObjRender
 from Material import Material
 import random
 
-class Zombie(ObjRender):
-    
+
+class ZombieMini(ObjRender):
     SpawnPositions = [
         ((-15, 2, -38), (-15, 2, 22)),
         ((-10, 2, -40), (-10, 2, 22)),
@@ -19,7 +19,7 @@ class Zombie(ObjRender):
     def __init__(self, hp, damage, speed):
         (spawn_pos, target_pos) = random.choice(self.SpawnPositions)  # Sorteia spawn e destino
         super().__init__(*spawn_pos)
-        self.hp = hp 
+        self.hp = hp
         self.damage = damage
         self.speed = speed
         self.target_x, self.target_y, self.target_z = target_pos
@@ -27,37 +27,38 @@ class Zombie(ObjRender):
 
         # Criando um material para o zumbi (valores ajustáveis)
         self.material = Material(
-            ambiente  = (0.2, 0.2, 0.2, 1.0),
-            difuso    = (0.0, 0.5, 0.0, 1.0),  # Verde escuro
-            especular = (0.3, 0.3, 0.3, 1.0),
-            brilho    = 1
+            ambiente=(0.2, 0.2, 0.2, 1.0),
+            difuso=(0.0, 0.5, 0.0, 1.0),  # Verde escuro
+            especular=(0.3, 0.3, 0.3, 1.0),
+            brilho=1
         )
 
     def render(self):
         """Renderiza o zumbi na cena"""
 
-        # Corpo do zumbi
-        self.RenderCube(1, 1.5, 0.5, 0, 100, 0, self.material, 0)
+        # Corpo do zumbi mini
+        self.RenderCube(0.5, 0.75, 0.25, 150, 0, 0, self.material, 0)
 
-        # Cabeça do zumbi
+        # Cabeça do zumbi mini
         glPushMatrix()
-        glTranslatef(0, 3.75, 0)  
-        self.RenderCube(0.5, 0.5, 0.5, 0, 150, 0, self.material, 0)
+        glTranslatef(0, 1.875, 0)  
+        self.RenderCube(0.25, 0.25, 0.25, 150, 0, 0, self.material, 0)
         glPopMatrix()
 
-        # Braços
-        for dx in [-1.25, 1.25]:
+        # Braços do zumbi mini
+        for dx in [-0.625, 0.625]:
             glPushMatrix()
-            glTranslatef(dx, 1, 0)
-            self.RenderCube(0.3, 1, 0.3, 0, 100, 0, self.material, 0)
+            glTranslatef(dx, 0.5, 0)
+            self.RenderCube(0.15, 0.5, 0.15, 150, 0, 0, self.material, 0)
             glPopMatrix()
 
-        # Pernas
-        for dx in [-0.5, 0.5]:
+        # Pernas do zumbi mini
+        for dx in [-0.25, 0.25]:
             glPushMatrix()
-            glTranslatef(dx, -2, 0)
-            self.RenderCube(0.3, 1.5, 0.3, 0, 100, 0, self.material, 0)
+            glTranslatef(dx, -1, 0)
+            self.RenderCube(0.15, 0.75, 0.15, 150, 0, 0, self.material, 0)
             glPopMatrix()
+
 
     def move(self):
         """Movimenta o zumbi em direção ao alvo"""
