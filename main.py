@@ -7,16 +7,19 @@ from OpenGL.GL import *
 from OpenGL.GLU import * 
 from math import sqrt
 import time
+import random
 
 # Classes
 from Obj import ObjRender
+from Material import Material
 from Player import Player
 from Peashooter import Peashooter
-from Potato import Potato
 from Shoot import Shoot
-from CherryBomb import CherryBomb
-from Material import Material
+from Potato import Potato
+from HerbThorn import HerbThorn
 from Zombie import Zombie
+from ZombieMini import ZombieMini
+from texture import load_texture
 
 
 # Variáveis Globais
@@ -26,6 +29,7 @@ limite_x_positivo = 15
 limite_x_negativo = -15
 limite_z_positivo = 15
 limite_z_negativo = -15
+limite_z_gameover = 20
 
 # temporizadores
 spawn_cooldown = 10
@@ -57,6 +61,7 @@ posicao_luz   =  [40, 30, -40, 1.0]  # Posição da luz
 
 # Init
 def initialize():
+    global grass_texture, fence_texture, bush_texture, house_texture, roof_texture, underground_texture, cemetery_texture, tomb_texture, road_texture
     glClearColor(1,1,1,1)
     glLineWidth(5)
     glEnable(GL_DEPTH_TEST) 
@@ -67,12 +72,23 @@ def initialize():
     glLightfv(GL_LIGHT0, GL_AMBIENT, luz_ambiente)
     glLightfv(GL_LIGHT0, GL_DIFFUSE, luz_difusa)
     glLightfv(GL_LIGHT0, GL_SPECULAR, luz_especualr)
+    
+    grass_texture = load_texture("texturas\grama.jpg")
+    fence_texture = load_texture("texturas\cerca.jpg")
+    bush_texture = load_texture("texturas\moitas.jpg")
+    house_texture = load_texture("texturas\casa.jpg")
+    roof_texture = load_texture("texturas\cerca.jpg")
+    underground_texture = load_texture("texturas\cemiterio.jpg")
+    cemetery_texture =load_texture("texturas\cemiterio.jpg")
+    tomb_texture =load_texture("texturas/tumba.png")
+    road_texture = load_texture("texturas\estrada.jpg")
+    
 
 # Função para alterações do código
 def update():
-    global last_zumbie_spawn, spawn_cooldown
+    global last_zumbie_spawn, spawn_cooldown, window
     current_time = time.time()
-
+            
     # Lógica dos tiros
     for s in shoots.copy():
         if s.z < -25:
@@ -80,46 +96,56 @@ def update():
         else:
             for zumbie in zumbies.copy():
                 if colision(s, zumbie, 5):
-                    if s in shoots: shoots.remove(s)
+                    shoots.remove(s)
                     zumbie.hp -= s.demage
-                    print(zumbie.hp)
                     if zumbie.hp <= 0:
                         zumbies.remove(zumbie)
+                    
 
     # Lógica das plantas
     for p in plants.copy():
-        if p.type == "Peashooter" and current_time - p.time_init  > 10:
-            px, py, pz = p.getPos()
-            shoots.append(Shoot(px, py + 4, pz, p.demage))
-            p.time_init = time.time()
-        if p.type == "CherryBomb" and current_time - p.time_init  > 2:
-            plants.remove(p) 
+        if p.type == "Peashooter" and current_time - p.time_init  > 5:
+            shoots.append(Shoot(*p.getPos(), p.demage))
+            p.time_init = current_time
 
     # Lógica dos Zumbies
-    dps = time.time()
     for zumbie in zumbies.copy():
-        colidiu = False  # Flag para verificar se o zumbi colidiu com alguma planta
-        for p in plants.copy():
-            if colision(p, zumbie, 5):
-                colidiu = True  # O zumbi colidiu, então ele não deve se mover
-                if time.time() - dps >= 1:
-                    p.hp -= zumbie.damage
-                    dps = time.time()
-
-                if p.hp <= 0:
-                    plants.remove(p)
+        if zumbie.z >= limite_z_gameover:
+            print("Game Over! Um zumbi chegou ao fim do cenário.")
+            glfw.set_window_should_close(window, True)  # Fecha a janela e encerra o jogo
+        colidiu = False
         
+        if zumbie.hp <= 0:
+            zumbies.remove(zumbie)
+        for p in plants.copy():
+            if p.hp <= 0:
+                plants.remove(p)
+            elif colision(p, zumbie, 5):
+                if p.type == "HerbThorn":
+                    p.apply_damage(zumbie, current_time, 2)
+                else:
+                    colidiu = True  # O zumbi colidiu, então ele não deve se mover
+                    p.apply_damage(zumbie, current_time, 0)
+
+                    if current_time - zumbie.cooldown >= 1:
+                        p.hp -= zumbie.damage
+                        zumbie.cooldown  = current_time
+
         if not colidiu:  # Só move se não colidiu com nenhuma planta
             zumbie.move()
 
             
     if current_time - last_zumbie_spawn >= spawn_cooldown:
-        zumbies.append(Zombie(100, 20, 0.01))
+        if random.random() < 0.5:  # 50% de chance para cada
+            zumbies.append(Zombie(100, 20, 0.01))  
+        else:
+            zumbies.append(ZombieMini(50, 10, 0.03))  
+
         last_zumbie_spawn = time.time()
 
     mover_camera_posicao()
     
-# Função que desenha na tela
+ # Função que desenha na tela
 def render():
     # Definição do espaço
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)   
@@ -134,16 +160,24 @@ def render():
     gluLookAt( *posicao_atual_camera[:3],     # Posição da Câmera
                *posicao_atual_camera[3:],     # Foco da camera
                 0,   1 , 0  )                 # Vetor Up
-   
+    
     # Renderização de objetos na cena
+
     grass_matirial = Material([0.1, 0.3, 0.1, 1.0], 
                               [0.2, 0.6, 0.2, 1.0], 
                               [0.1, 0.1, 0.1, 1.0],
                               10)
     
+    glEnable(GL_TEXTURE_2D)
+    glBindTexture(GL_TEXTURE_2D, grass_texture) 
+
+    # Supondo que você queira repetir a textura 5 vezes por face:
     grass = ObjRender(0, -3, 0)
-    grass.RenderCube(20, 1.5, 20, 165, 245, 96, grass_matirial)
-    
+    grass.RenderCube(20, 1.5, 20, 165, 245, 96, grass_matirial, 1)
+
+    glBindTexture(GL_TEXTURE_2D, 0)
+    glDisable(GL_TEXTURE_2D)
+     
     
     fence_material = Material(
     [0.2, 0.15, 0.1, 1.0],  # Ambiente (marrom escuro)
@@ -151,10 +185,22 @@ def render():
     [0.1, 0.1, 0.1, 1.0],   # Especular (pouco brilho)
     20.0                    # Brilho (baixo)
     )
-
-    fence = ObjRender(-19, 0, 0)
-    fence.RenderCube(1, 2, 20, 100, 100, 100, fence_material)
     
+    glEnable(GL_TEXTURE_2D)
+    glBindTexture(GL_TEXTURE_2D, fence_texture) 
+
+    fence_positions = [
+        (-19, 0, 0),
+        (19, 0, 0)
+    ]
+
+    for pos in fence_positions:
+        fence = ObjRender(*pos)
+        fence.RenderCube(1, 2, 20, 100, 100, 100, fence_material, 1)  
+    
+    glBindTexture(GL_TEXTURE_2D, 0)
+    glDisable(GL_TEXTURE_2D)
+
     bush_material = Material(
     [0.1, 0.2, 0.1, 1.0],  # Ambiente (verde escuro)
     [0.2, 0.4, 0.2, 1.0],  # Difusa (verde médio)
@@ -162,11 +208,20 @@ def render():
     10.0                   # Brilho (muito baixo)
     )
 
-    bush_back = ObjRender(-19, 0, -40)
-    bush_back.RenderCube(1, 1.5, 10, 31, 48, 32, bush_material)
+    glEnable(GL_TEXTURE_2D)
+    glBindTexture(GL_TEXTURE_2D, bush_texture) 
 
-    bush_front = ObjRender(19, 0, -40)
-    bush_front.RenderCube(1, 1.5, 10, 31, 48, 32, bush_material)
+    bush_d = ObjRender(-19, 0, -40)
+    bush_d.RenderCube(1, 1.5, 10, 255, 255, 255, bush_material, 1)    
+    
+    bush_back = ObjRender(0, 0, -50)
+    bush_back.RenderCube(20, 1.5, 1, 255, 255, 255, bush_material, 1)
+
+    bush_e = ObjRender(19, 0, -40)
+    bush_e.RenderCube(1, 1.5, 10, 255, 255, 255, bush_material, 1)
+
+    glBindTexture(GL_TEXTURE_2D, 0)
+    glDisable(GL_TEXTURE_2D)
 
     house_material = Material(
         [0.3, 0.3, 0.3, 1.0],  # Ambiente (cinza claro)
@@ -175,8 +230,14 @@ def render():
         50.0                   # Brilho (moderado)
     )
 
+    glEnable(GL_TEXTURE_2D)
+    glBindTexture(GL_TEXTURE_2D, house_texture) 
+    
     house = ObjRender(0, 0, 25)
-    house.RenderCube(20, 5, 5, 238, 223, 190, house_material)
+    house.RenderCube(20, 5, 5, 238, 223, 190, house_material, 1)
+
+    glBindTexture(GL_TEXTURE_2D, 0)
+    glDisable(GL_TEXTURE_2D)
 
     roof_material = Material(
         [0.3, 0.1, 0.1, 1.0],  # Ambiente (vermelho escuro)
@@ -185,9 +246,15 @@ def render():
         30.0                   # Brilho (moderado)
     )
 
+    # glEnable(GL_TEXTURE_2D)
+    # glBindTexture(GL_TEXTURE_2D, roof_texture) 
+    
     roof = ObjRender(0, 10, 25)
     roof.RenderPrismaTriangular(20, 5, 8, 191, 62, 33, roof_material)
     
+    # glBindTexture(GL_TEXTURE_2D, 0)
+    # glDisable(GL_TEXTURE_2D)
+
     road_material = Material(
         [0.1, 0.1, 0.1, 1.0],  # Ambiente (cinza escuro)
         [0.3, 0.3, 0.3, 1.0],  # Difusa (cinza médio)
@@ -195,9 +262,15 @@ def render():
         10.0                   # Brilho (muito baixo)
     )
 
+    glEnable(GL_TEXTURE_2D)
+    glBindTexture(GL_TEXTURE_2D, road_texture)
+
     road = ObjRender(0, -3, -25)
-    road.RenderCube(20, 1.5, 5, 128, 128, 128, road_material)
+    road.RenderCube(20, 1.5, 5, 128, 128, 128, road_material, 1)
     
+    glBindTexture(GL_TEXTURE_2D, 0)
+    glDisable(GL_TEXTURE_2D)
+
     underground_material = Material(
         [0.2, 0.15, 0.1, 1.0],  # Ambiente (marrom escuro)
         [0.4, 0.3, 0.2, 1.0],   # Difusa (marrom médio)
@@ -205,9 +278,15 @@ def render():
         10.0                   # Brilho (muito baixo)
     )
 
+    glEnable(GL_TEXTURE_2D)
+    glBindTexture(GL_TEXTURE_2D, underground_texture)
+
     underground = ObjRender(0, -3, 25)
-    underground.RenderCube(20, 1.5, 5, 64, 59, 19, underground_material)
+    underground.RenderCube(20, 1.5, 5, 64, 59, 19, underground_material, 1)
     
+    glBindTexture(GL_TEXTURE_2D, 0)
+    glDisable(GL_TEXTURE_2D)
+
     cemetery_material = Material(
         [0.1, 0.1, 0.1, 1.0],  # Ambiente (cinza escuro)
         [0.2, 0.2, 0.2, 1.0],  # Difusa (cinza médio)
@@ -215,8 +294,42 @@ def render():
         10.0                   # Brilho (muito baixo)
     )
 
+    glEnable(GL_TEXTURE_2D)
+    glBindTexture(GL_TEXTURE_2D, cemetery_texture)
+
     cemetery = ObjRender(0, -3, -40)
-    cemetery.RenderCube(20, 1.5, 10, 64, 59, 19, cemetery_material)
+    cemetery.RenderCube(20, 1.5, 10, 64, 59, 19, cemetery_material, 1)
+
+    glBindTexture(GL_TEXTURE_2D, 0)
+    glDisable(GL_TEXTURE_2D)
+
+    tombs_material = Material(
+    [0.1, 0.2, 0.1, 1.0],     # Ambiente (verde escuro)
+    [0.2, 0.4, 0.2, 1.0],     # Difusa (verde médio)
+    [0.05, 0.05, 0.05, 1.0],  # Especular (quase sem brilho)
+    10.0                      # Brilho (muito baixo)
+    )
+    
+    glEnable(GL_TEXTURE_2D)
+    glBindTexture(GL_TEXTURE_2D, tomb_texture)
+
+    tomb_positions = [
+        (-15, 0, -38),
+        (-10, 0, -40),
+        (-5, 0, -37),
+        (0, 0, -39),
+        (5, 0, -40),
+        (10, 0, -37),
+        (15, 0, -38)
+    ]
+
+    for pos in tomb_positions:
+        tomb = ObjRender(*pos)
+        tomb.RenderCube(3, 3, 0.01, 0, 0, 0, tombs_material, 1)  
+
+    glBindTexture(GL_TEXTURE_2D, 0)
+    glDisable(GL_TEXTURE_2D)
+
 
     player = Player(x, y, z)
     player.render()
@@ -277,8 +390,8 @@ def planting(type):
         new_plant = Peashooter(x, y, z, 100, 25)
     elif type == "Potato":
         new_plant = Potato(x, y, z, 250, 0)
-    elif type == "CherryBomb":
-        new_plant = CherryBomb(x, y, z, 1, 1000)
+    elif type == "HerbThorn":
+        new_plant = HerbThorn(x, y, z, 10, 5)
 
     plants.append(new_plant)
 
@@ -313,13 +426,17 @@ def keyboard(window, key, scancode, action, mods):
         if key == glfw.KEY_2:
             planting("Potato")
         if key == glfw.KEY_3:
-            planting("CherryBomb")
+            planting("HerbThorn")
+        if key == glfw.KEY_R:
+            plants.pop()
         
         # Câmera
         if key == glfw.KEY_ENTER:
             moveCam()    
     
 def main():
+    global window
+    
     glfw.init()                                                      
     window = glfw.create_window(800,800,'PVZ',None,None)
     glfw.make_context_current(window)       

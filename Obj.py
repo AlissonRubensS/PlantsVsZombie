@@ -11,8 +11,8 @@ class ObjRender:
     def getPos(self):
         return (self.x, self.y, self.z)
     
-    def RenderCube(self, width, height, depth, r, g, b, material):
-        # Adicionar as cores
+    def RenderCube(self, width, height, depth, r, g, b, material, textura_Tam):
+        # Converte as cores para o intervalo [0,1]
         r = r / 255
         g = g / 255
         b = b / 255
@@ -46,25 +46,41 @@ class ObjRender:
             [-1,  0,  0], # Lado esquerdo
         ]
 
-        # Adicionar as propriedades do material
+        # Propriedades do material
         glMaterialfv(GL_FRONT, GL_AMBIENT, material.coeficiente_ambiente)
         glMaterialfv(GL_FRONT, GL_DIFFUSE, material.coeficiente_difuso)
         glMaterialfv(GL_FRONT, GL_SPECULAR, material.coeficiente_especular)
         glMaterialf(GL_FRONT, GL_SHININESS, material.brilho)
         
-        # Transformações
         glPushMatrix()
         glTranslatef(self.x, self.y + height, self.z)
         glScalef(width, height, depth)
 
-        # Renderizar tiras de preenchimento
         glPolygonMode(GL_FRONT_AND_BACK, GL_FILL)
         glColor3f(r, g, b)
+        
+        # Se textura_Tam for 0, use_texture será False automaticamente
+        use_texture = bool(textura_Tam)
+        
         glBegin(GL_QUADS)
         for strip, n in zip(faces, normal):
             glNormal3fv(n)
-            for vid in strip:
-                glVertex3fv(vertex[vid])
+            
+            if use_texture:
+                glTexCoord2f(0.0, 0.0)
+            glVertex3fv(vertex[strip[0]])
+            
+            if use_texture:
+                glTexCoord2f(textura_Tam, 0.0)
+            glVertex3fv(vertex[strip[1]])
+            
+            if use_texture:
+                glTexCoord2f(textura_Tam, textura_Tam)
+            glVertex3fv(vertex[strip[2]])
+            
+            if use_texture:
+                glTexCoord2f(0.0, textura_Tam)
+            glVertex3fv(vertex[strip[3]])
         glEnd()
         glPopMatrix()
 

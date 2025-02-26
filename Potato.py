@@ -15,7 +15,4 @@ class Potato(Plants):
                             [0.0, 0.0, 0.0, 1.0], 
                             50)
         
-        self.RenderCube(1.5, 3, 1.5, 187, 105, 47, material)
-
-    def getPos(self):
-        return (self.x, self.y, self.z)
+        self.RenderCube(1.5, 3, 1.5, 187, 105, 47, material, 0)
