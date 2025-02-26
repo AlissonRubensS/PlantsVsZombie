@@ -61,7 +61,7 @@ posicao_luz   =  [40, 30, -40, 1.0]  # Posição da luz
 
 # Init
 def initialize():
-    global grass_texture, fence_texture, bush_texture, house_texture, roof_texture, underground_texture, cemetery_texture, tomb_texture, road_texture
+    global grass_texture, fence_texture, bush_texture, house_texture, roof_texture, underground_texture, cemetery_texture, tomb_texture, road_texture, skybox
     glClearColor(1,1,1,1)
     glLineWidth(5)
     glEnable(GL_DEPTH_TEST) 
@@ -82,8 +82,43 @@ def initialize():
     cemetery_texture =load_texture("texturas\cemiterio.jpg")
     tomb_texture =load_texture("texturas/tumba.png")
     road_texture = load_texture("texturas\estrada.jpg")
+    skybox = load_texture("texturas/Skybox.jpg")
     
+def Skybox(size = 5):
+    glEnable(GL_TEXTURE_2D)
+    # glBindTexture(GL_TEXTURE_2D, skybox)
 
+    skybox_textures = {
+        "left":   ([0.0, 0.33], [0.25, 0.33], [0.0, 0.66], [0.25, 0.66]),
+        "right":  ([0.5, 0.33], [0.75, 0.33], [0.5, 0.66], [0.75, 0.66]),
+        "front":  ([0.25, 0.33], [0.5, 0.33], [0.25, 0.66], [0.5, 0.66]),
+        "back":   ([0.75, 0.33], [1, 0.33], [0.75, 0.66], [1, 0.66]),
+        "top":    ([0.25, 0.66], [0.5, 0.66], [0.25, 1], [0.5, 1]),
+        "bottom": ([0.25, 0], [0.5, 0], [0.25, 0.33], [0.5, 0.33]),
+    }
+
+    faces = [
+        ("right",  [size, -size, -size],  [size, -size, size],  [size, size, size],  [size, size, -size]),  
+        ("left",   [-size, -size, size],  [-size, -size, -size],  [-size, size, -size],  [-size, size, size]),  
+        ("front",  [-size, -size, -size],  [size, -size, -size],  [size, size, -size],  [-size, size, -size]), 
+        ("back",   [size, -size, size],  [-size, -size, size],  [-size, size, size],  [size, size, size]), 
+        ("top",    [-size, size, -size],  [size, size, -size],  [size, size, size],  [-size, size, size]),  
+        ("bottom", [-size, -size, size],  [size, -size, size],  [size, -size, -size],  [-size, -size, -size]),  
+    ]
+
+    for face, v1, v2, v3, v4 in faces:
+        glTexCoord2fv(skybox_textures[face][0])
+        glVertex3fv(v1)
+        glTexCoord2fv(skybox_textures[face][1])
+        glVertex3fv(v2)
+        glTexCoord2fv(skybox_textures[face][2])
+        glVertex3fv(v3)
+        glTexCoord2fv(skybox_textures[face][3])
+        glVertex3fv(v4)
+
+    # glBindTexture(GL_TEXTURE_2D, 0)
+    glDisable(GL_TEXTURE_2D)
+    
 # Função para alterações do código
 def update():
     global last_zumbie_spawn, spawn_cooldown, window
@@ -146,6 +181,7 @@ def update():
     mover_camera_posicao()
     
  # Função que desenha na tela
+
 def render():
     # Definição do espaço
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)   
@@ -168,9 +204,11 @@ def render():
                               [0.1, 0.1, 0.1, 1.0],
                               10)
     
+    Skybox()
+
     glEnable(GL_TEXTURE_2D)
     glBindTexture(GL_TEXTURE_2D, grass_texture) 
-
+    
     # Supondo que você queira repetir a textura 5 vezes por face:
     grass = ObjRender(0, -3, 0)
     grass.RenderCube(20, 1.5, 20, 165, 245, 96, grass_matirial, 1)
@@ -329,7 +367,6 @@ def render():
 
     glBindTexture(GL_TEXTURE_2D, 0)
     glDisable(GL_TEXTURE_2D)
-
 
     player = Player(x, y, z)
     player.render()
